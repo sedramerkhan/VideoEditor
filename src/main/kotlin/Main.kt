@@ -3,26 +3,19 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import org.opencv.core.Mat
 import java.io.File
 
 @Composable
 @Preview
 fun App() {
 
-    var matList: SnapshotStateList<Mat>
-    val player = VideoPlayerJava("C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4")
-
-    matList = player.play()
-
     MaterialTheme {
-       VideoEditorScreen(matList)
+            VideoEditorScreen()
 
     }
 }

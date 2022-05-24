@@ -10,33 +10,39 @@ import javax.swing.*;
 public class VideoPlayerJava {
 
     VideoCapture vCapture;
-    SnapshotStateList<Mat> matList;
+    Mat mat;
+    boolean end;
 
     public VideoPlayerJava(String path) {
         this.vCapture = new VideoCapture();
         vCapture.open(path);
-        matList = new SnapshotStateList();
+        end = false;
     }
 
     public VideoPlayerJava(VideoCapture vCapture) {
         this.vCapture = vCapture;
+        end = false;
     }
 
-    public SnapshotStateList<Mat> play() {
-
+    public Mat play() {
+        mat = new Mat();
         if (!vCapture.isOpened()) {
             System.out.println("media failed to open");
             return null;
         } else {
-            while (vCapture.grab()) {
-                matList.add(new Mat());
-                vCapture.retrieve(matList.get(matList.size() - 1));
+           if (vCapture.grab()) {
+                vCapture.retrieve(mat);
 //                System.out.println(matList.size());
 //                showInFrame(mat);
+               return mat;
             }
-            System.out.println("Done");
-            vCapture.release();
-            return matList;
+           else{
+               System.out.println("Done");
+               vCapture.release();
+               return null;
+           }
+
+
         }
     }
 
