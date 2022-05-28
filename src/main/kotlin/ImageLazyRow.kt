@@ -3,13 +3,11 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,9 +19,10 @@ import kotlinx.coroutines.launch
 import org.opencv.core.Mat
 
 @Composable
-fun ImageLazyRow(matList: SnapshotStateList<Mat>){
+fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val list = matList.filterIndexed { index, _ -> index % 3 == 0 }
     LazyRow(
         state = scrollState,
         modifier = Modifier
@@ -36,15 +35,21 @@ fun ImageLazyRow(matList: SnapshotStateList<Mat>){
                 },
             )
     ) {
-        itemsIndexed(matList) { index ,mat->
+        itemsIndexed(list) { index, mat ->
             Column {
                 Image(
-                    bitmap = asImageAsset(mat), contentDescription = null, modifier = Modifier.size(250.dp)
+                    bitmap = asImageAsset(mat),
+                    contentDescription = null,
+                    modifier = Modifier.width(100.dp).padding(vertical = 10.dp)
                 )
-                Text(index.toString(), modifier = Modifier.align(Alignment.CenterHorizontally))
+                Text(
+                    index.toString(),
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
 
-            Spacer(Modifier.width(16.dp))
+//            Spacer(Modifier.width(16.dp))
         }
     }
 }
