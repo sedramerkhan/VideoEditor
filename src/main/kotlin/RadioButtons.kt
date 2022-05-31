@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 
 @Composable
 fun SimpleRadioButtonComponent(
@@ -15,11 +14,10 @@ fun SimpleRadioButtonComponent(
 ) {
     val radioOptions = WaterMarkState.values()
 //   var (selectedOption,onOptionSelected) = remember { mutableStateOf(radioOptions[3]) }
-    Row(
-    ) {
+    Row(modifier) {
         radioOptions.forEach { text ->
             Row(
-                modifier
+               Modifier.padding(top = 16.dp)
                     .selectable(
                         selected = (text == selectedOption),
                         onClick = {
@@ -30,7 +28,7 @@ fun SimpleRadioButtonComponent(
 
             ) {
                 RadioButton(
-                    selected = (text == selectedOption), modifier = Modifier,
+                    selected = (text == selectedOption), modifier = Modifier.size(30.dp),
                     onClick = {
                         onOptionSelected(text)
                         println(text)
@@ -40,7 +38,7 @@ fun SimpleRadioButtonComponent(
                     text = text.name,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
-                Spacer(Modifier.width(5.dp))
+                Spacer(Modifier.width(16.dp))
             }
         }
 

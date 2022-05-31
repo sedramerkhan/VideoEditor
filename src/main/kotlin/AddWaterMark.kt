@@ -41,18 +41,7 @@ fun AddWaterMark(
                 modifier = modifier,
 
                 ) {
-                TextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    modifier = Modifier,
-                    placeholder = { Text(text = "Enter WaterMark") },
-                    colors  = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background,
-                        focusedIndicatorColor = MaterialTheme.colors.onPrimary,
-                        unfocusedIndicatorColor = MaterialTheme.colors.onPrimary,
-
-                        )
-                )
+                CustomTextField(text,"Enter WaterMark"){ text =it }
 
                 IconButton(onClick = {
                    if(text.isNotEmpty()) {

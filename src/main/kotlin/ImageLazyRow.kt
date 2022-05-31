@@ -22,7 +22,7 @@ import org.opencv.core.Mat
 fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val list = matList.filterIndexed { index, _ -> index % 3 == 0 }
+//    val list = matList.filterIndexed { index, _ -> index % 3 == 0 }
     LazyRow(
         state = scrollState,
         modifier = Modifier
@@ -35,7 +35,7 @@ fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
                 },
             )
     ) {
-        itemsIndexed(list) { index, mat ->
+        itemsIndexed(matList) { index, mat ->
             Column {
                 Image(
                     bitmap = asImageAsset(mat),

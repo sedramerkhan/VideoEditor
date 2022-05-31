@@ -1,3 +1,3 @@
 public enum VideoState {
-    WaterMarkAdding, FPSChoosing,Nothing;
+    WaterMarkAdding, FPSChoosing,Nothing,VideosMerging,VideoCutting, VideoFromImages,VideoResizing,
 }

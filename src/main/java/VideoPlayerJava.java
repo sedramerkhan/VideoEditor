@@ -78,7 +78,6 @@ public class VideoPlayerJava {
         }
     }
 
-
     public void write(List<Mat> matList, int fps) {
 
         videoWriter = new VideoWriter("C:\\test5.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
@@ -98,6 +97,7 @@ public class VideoPlayerJava {
                     Imgproc.FONT_HERSHEY_PLAIN, 1.0,
                     new Scalar(255, 150, 200, 30), 1);
         }
+        System.out.println("Text Water Mark is Added Successfully");
     }
 
     public void addImageWaterMark(List<Mat> matList, String path) {
@@ -108,11 +108,12 @@ public class VideoPlayerJava {
             Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
             Core.addWeighted(source.submat(ROI), 0.8, waterMark, 0.2, 1, source.submat(ROI));
         }
+        System.out.println("Image Water Mark is Added Successfully");
+
     }
 
     public void addVideoWaterMark(List<Mat> matList,String path) {
         List<Mat> waterMark = this.getFrames(path);
-        System.out.println("water mark image: " + waterMark.size());
         for (int i = 0; i < matList.size(); i++) {
             if (i >= waterMark.size())
                 break;
@@ -122,6 +123,21 @@ public class VideoPlayerJava {
             Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
 
         }
+        System.out.println("Video Water Mark is Added Successfully");
+
+    }
+
+    public void merge2Videos(List<Mat> matList,String path){
+        List<Mat> matList2 = this.getFrames(path);
+        matList.addAll(matList2);
+        System.out.println("Video is Added Successfully");
+
+    }
+
+    public Mat resize(Size size, Mat waterMark) {
+        Mat resizedImage = new Mat();
+        Imgproc.resize(waterMark, resizedImage, size);
+        return resizedImage;
     }
 
     public void addWaterMarkText(List<Mat> matList, int fps) {
@@ -143,13 +159,6 @@ public class VideoPlayerJava {
         videoWriter.release();
 
     }
-
-    private Mat resize(Size size, Mat waterMark) {
-        Mat resizedImage = new Mat();
-        Imgproc.resize(waterMark, resizedImage, size);
-        return resizedImage;
-    }
-
 
     public void addWaterMarkImage(List<Mat> matList, int fps) {
 
