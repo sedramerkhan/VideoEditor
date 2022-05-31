@@ -1,11 +1,13 @@
 
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.opencv.imgproc.Imgproc.putText;
@@ -17,6 +19,10 @@ public class VideoPlayerJava {
     Mat mat;
     VideoWriter videoWriter;
 
+    public VideoPlayerJava() {
+        this.vCapture = new VideoCapture();
+    }
+
     public VideoPlayerJava(String path) {
         this.vCapture = new VideoCapture();
         vCapture.open(path);
@@ -26,7 +32,16 @@ public class VideoPlayerJava {
         this.vCapture = vCapture;
     }
 
-    public Mat play() {
+    public boolean openVideo(String path) {
+        try {
+            vCapture.open(path);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Mat getFrame() {
         mat = new Mat();
         if (!vCapture.isOpened()) {
             System.out.println("media failed to open");
@@ -42,14 +57,31 @@ public class VideoPlayerJava {
                 vCapture.release();
                 return null;
             }
-
-
         }
     }
 
+    public List<Mat> getFrames(String path) {
+        vCapture.open(path);
+        List<Mat> list = new ArrayList();
+        if (!vCapture.isOpened()) {
+            System.out.println("media failed to open");
+            return null;
+        } else {
+
+            while (vCapture.grab()) {
+                list.add(new Mat());
+                vCapture.retrieve(list.get(list.size() - 1));
+            }
+            System.out.println("Done");
+            vCapture.release();
+            return list;
+        }
+    }
+
+
     public void write(List<Mat> matList, int fps) {
 
-        videoWriter = new VideoWriter("C:\\test2.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
+        videoWriter = new VideoWriter("C:\\test5.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
                 fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
         for (Mat mat : matList) {
             System.out.println(mat.size());
@@ -57,22 +89,39 @@ public class VideoPlayerJava {
         }
         videoWriter.release();
 
-//        String path =   "C:\\Users\\Sedra\\Desktop\\legend.mp4";
-//        VideoCapture videoCapture = new VideoCapture();
-//        videoCapture.open(path);
-//        Size frameSize = new Size(426,240);
-//        VideoWriter videoWriter = new VideoWriter("C:\\test2.avi",VideoWriter.fourcc('M','J','P','G'),
-//                30, frameSize, true);
-//        mat = new Mat();
-//        while (videoCapture.read(mat)) {
-////            mat = new Mat();
-////            videoCapture.retrieve(mat);
-//            System.out.println(mat.size());
-//            videoWriter.write(mat);
-//        }
-//        videoCapture.release();
-//        videoWriter.release();
+    }
 
+    public void addTextWaterMark(List<Mat> matList,String text) {
+        for (Mat source : matList) {
+            putText(source, text,
+                    new Point(source.rows() / 2, source.cols() / 5),
+                    Imgproc.FONT_HERSHEY_PLAIN, 1.0,
+                    new Scalar(255, 150, 200, 30), 1);
+        }
+    }
+
+    public void addImageWaterMark(List<Mat> matList, String path) {
+        Mat waterMark = Imgcodecs.imread(path);
+        waterMark = this.resize(matList.get(0).size(), waterMark);
+        System.out.println("water mark image: " + waterMark.size());
+        for (Mat source : matList) {
+            Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
+            Core.addWeighted(source.submat(ROI), 0.8, waterMark, 0.2, 1, source.submat(ROI));
+        }
+    }
+
+    public void addVideoWaterMark(List<Mat> matList,String path) {
+        List<Mat> waterMark = this.getFrames(path);
+        System.out.println("water mark image: " + waterMark.size());
+        for (int i = 0; i < matList.size(); i++) {
+            if (i >= waterMark.size())
+                break;
+            Mat source = matList.get(i);
+            Mat waterMarkImage = this.resize(source.size(), waterMark.get(i));
+            Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
+            Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
+
+        }
     }
 
     public void addWaterMarkText(List<Mat> matList, int fps) {
@@ -95,29 +144,44 @@ public class VideoPlayerJava {
 
     }
 
+    private Mat resize(Size size, Mat waterMark) {
+        Mat resizedImage = new Mat();
+        Imgproc.resize(waterMark, resizedImage, size);
+        return resizedImage;
+    }
+
+
     public void addWaterMarkImage(List<Mat> matList, int fps) {
 
-        videoWriter = new VideoWriter("C:\\waterMarked1.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
+        videoWriter = new VideoWriter("C:\\waterMarkedImage1.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
                 fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
         Mat waterMark = Imgcodecs.imread("src/main/resources/tutorialspoint.jpg");
+        waterMark = this.resize(matList.get(0).size(), waterMark);
         System.out.println("water mark image: " + waterMark.size());
         for (Mat mat : matList) {
             Mat source = mat.clone();
             System.out.println(mat.size());
-            Rect ROI = new Rect(source.rows() / 5, source.cols() / 5, waterMark.cols(), waterMark.rows());
-
+            Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
             Core.addWeighted(source.submat(ROI), 0.8, waterMark, 0.2, 1, source.submat(ROI));
+            videoWriter.write(source);
+        }
+        videoWriter.release();
 
-//            Imgcodecs.putText(
-//                    source,
-//                    "Tutorialspoint.com",
-//                    Point((source.rows() / 3).toDouble(), (source.cols() / 5).toDouble()),
-//                    Core.FONT_ITALIC,
-//                    2.0,
-//                    Scalar(255.0, 150.0, 200.0,30.0)
-//            )
-//            Core.putText(source, "Tutorialspoint.com", new Point  (source.rows()/2,source.cols()/2), Core.FONT_ITALIC,new Double(1),new  Scalar(255));
+    }
 
+    public void addWaterMarkVideo(List<Mat> matList, List<Mat> waterMark, int fps) {
+
+        videoWriter = new VideoWriter("C:\\waterMarkedVideo1.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
+                fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
+
+        System.out.println("water mark image: " + waterMark.size());
+        for (int i = 0; i < matList.size(); i++) {
+            if (i >= waterMark.size())
+                break;
+            Mat source = matList.get(i).clone();
+            Mat waterMarkImage = this.resize(source.size(), waterMark.get(i));
+            Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
+            Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
             videoWriter.write(source);
         }
         videoWriter.release();
