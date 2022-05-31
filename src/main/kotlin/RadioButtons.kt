@@ -9,28 +9,28 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 fun SimpleRadioButtonComponent(
-    onOptionSelected: (WaterMarkState) -> Unit
+    selectedOption: WaterMarkState,
+    modifier: Modifier,
+    onOptionSelected: (WaterMarkState) -> Unit,
 ) {
     val radioOptions = WaterMarkState.values()
-    var selectedOption by remember { mutableStateOf(radioOptions[3]) }
 //   var (selectedOption,onOptionSelected) = remember { mutableStateOf(radioOptions[3]) }
     Row(
     ) {
         radioOptions.forEach { text ->
             Row(
-                Modifier
+                modifier
                     .selectable(
                         selected = (text == selectedOption),
                         onClick = {
-                            selectedOption = text
                             onOptionSelected(text)
                             println(text)
                         }
                     )
-                    .padding(horizontal = 16.dp)
+
             ) {
                 RadioButton(
-                    selected = (text == selectedOption), modifier = Modifier.padding(all = Dp(value = 2F)),
+                    selected = (text == selectedOption), modifier = Modifier,
                     onClick = {
                         onOptionSelected(text)
                         println(text)

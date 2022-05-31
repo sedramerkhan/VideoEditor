@@ -33,6 +33,7 @@ fun VideoEditorScreen() {
     val fps = remember { mutableStateOf(2) }
     var state by remember { mutableStateOf(VideoState.Nothing) }
     var waterMarkState by remember { mutableStateOf(WaterMarkState.NoWaterMark) }
+
     //Todo: delete this
     LaunchedEffect(Unit)
     {
@@ -60,18 +61,15 @@ fun VideoEditorScreen() {
             }
         }
 
+        val modifier = Modifier.padding(horizontal = 5.dp)
         Column(Modifier.padding(25.dp)) {
             if (matList.isNotEmpty()) {
                 println(matList.size)
                 ImageLazyRow(matList)
 
-                Button(onClick = {
-                    state = VideoState.WaterMarkAdding
-                }) {
-                    Text(text = "  Add WaterMark  ")
-                }
+                Button(onClick = { state = VideoState.WaterMarkAdding }) { Text(text = "  Add WaterMark  ") }
                 if (state == VideoState.WaterMarkAdding) {
-                    SimpleRadioButtonComponent { waterMarkState = it }
+                    SimpleRadioButtonComponent(waterMarkState,modifier) { waterMarkState = it }
 
                     AddWaterMark(
                         waterMarkState,
@@ -87,18 +85,18 @@ fun VideoEditorScreen() {
                             player.addTextWaterMark(matList, it)
                             waterMarkState = WaterMarkState.NoWaterMark
                         },
+                        cancel = { waterMarkState = WaterMarkState.NoWaterMark},
+                        modifier,
                     )
                 }
 
-                Button(onClick = {
-                    state = VideoState.FPSChoosing
 
-                }) {
-                    Text(text = "Save Video to Disk")
-                }
+
+                Button(onClick = { state = VideoState.FPSChoosing }) { Text(text = "Save Video to Disk") }
                 if (state == VideoState.FPSChoosing) {
                     ChooseFPS(
                         fps,
+                        modifier = modifier,
                         onFPSChosen = {
                             println(fps.value * 10)
                             player.write(matList, fps.value * 10)

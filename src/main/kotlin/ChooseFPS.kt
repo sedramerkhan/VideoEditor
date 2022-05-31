@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -14,11 +15,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ChooseFPS(
     fps: MutableState<Int>,
-    onFPSChosen: ()-> Unit
+    onFPSChosen: ()-> Unit,
+    modifier: Modifier
 ){
-    Row {
+    Row(modifier) {
         Text(
-            text = "Choose FPS:",
+            text = "Choose fps:",
             modifier = Modifier.align(Alignment.CenterVertically).padding(end = 10.dp)
         )
         NumberPicker(
@@ -30,7 +32,7 @@ fun ChooseFPS(
         IconButton(
             modifier = Modifier.padding(start = 10.dp),
             onClick = onFPSChosen) {
-            Icon(Icons.Default.Done, null)
+            Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary)
         }
     }
 }

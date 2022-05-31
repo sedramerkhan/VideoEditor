@@ -86,7 +86,7 @@ fun NumberPicker(
     ) {
         val spacing = 4.dp
 
-        val arrowColor = MaterialTheme.colors.onSecondary.copy(alpha = ContentAlpha.disabled)
+        val arrowColor = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.disabled)
 
         Icon(Icons.Default.KeyboardArrowLeft,null, tint = arrowColor)
 

@@ -3,7 +3,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,42 +14,53 @@ fun AddWaterMark(
     onImageSelected: (String) -> Unit,
     onVideoSelected: (String) -> Unit,
     onTextSelected: (String) -> Unit,
+    cancel: () -> Unit,
+    modifier: Modifier
     ){
     var text by remember{ mutableStateOf("")}
+
     when(waterMarkState){
         WaterMarkState.Image -> {
             val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
             result?.let {
                onImageSelected(it.path)
+            } ?: run{
+               cancel()
             }
         }
         WaterMarkState.Video -> {
             val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
             result?.let {
                onVideoSelected(it.path)
+            }?: run{
+                cancel()
             }
         }
         WaterMarkState.Text ->{
             Row(
-                modifier = Modifier,
+                modifier = modifier,
 
                 ) {
                 TextField(
                     value = text,
                     onValueChange = { text = it },
-                    modifier = Modifier.padding(end = 16.dp),
-                    placeholder = { Text("") },
-                    label = { Text(text = "Enter Image") },
-                    leadingIcon = { Icon(Icons.Filled.Search, "Image") },
+                    modifier = Modifier,
+                    placeholder = { Text(text = "Enter WaterMark") },
+                    colors  = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.background,
+                        focusedIndicatorColor = MaterialTheme.colors.onPrimary,
+                        unfocusedIndicatorColor = MaterialTheme.colors.onPrimary,
+
+                        )
                 )
 
                 IconButton(onClick = {
-                    text.let {
-                        onTextSelected(it)
+                   if(text.isNotEmpty()) {
+                       onTextSelected(text)
                     }
                 }
                 ) {
-                    Icon(Icons.Default.Done,null)
+                    Icon(Icons.Default.Done,null,tint = MaterialTheme.colors.secondary)
                 }
             }
         }
