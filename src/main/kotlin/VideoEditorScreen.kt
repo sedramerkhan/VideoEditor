@@ -21,7 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun VideoEditorScreen() {
 
     var path =
-        "C:\\Users\\Sedra\\Desktop\\legend.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
+        "src/main/resources/test2.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
     val player by remember { mutableStateOf(VideoPlayerJava()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var showVideo by remember { mutableStateOf(false) }
