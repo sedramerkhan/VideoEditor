@@ -1,3 +1,5 @@
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import org.jetbrains.skia.Image
@@ -16,18 +18,23 @@ fun Mat.asImageAsset(): ImageBitmap {
     return Image.makeFromEncoded(byteArray).toComposeImageBitmap()
 }
 
-fun openLogFile(fileFilter : FileNameExtensionFilter): File? {
-    var result: File?
+fun openLogFile(fileFilter : FileNameExtensionFilter): MutableList<File?> {
+    val result: MutableList<File?> = mutableListOf()
     JFileChooser("${System.getProperty("user.home")}/Desktop").apply {
         fileSelectionMode = JFileChooser.FILES_ONLY
-        var st =listOf("jpg", "png", "gif", "bmp")
         addChoosableFileFilter(fileFilter)
         isAcceptAllFileFilterUsed = true
+        isMultiSelectionEnabled = true
         showOpenDialog(null)
-        result = selectedFile
-        println(selectedFile)
+        result.addAll(selectedFiles)
+        println("${selectedFiles.size}files is/are selected")
     }
     return result
 }
 
 fun String.isDigit() = isNotEmpty() && all{ it.isDigit()}
+
+fun SnapshotStateList<Mat>.clone(list: SnapshotStateList<Mat>) {
+    this.clear()
+    this.addAll(list)
+}

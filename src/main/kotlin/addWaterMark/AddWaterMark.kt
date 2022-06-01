@@ -21,16 +21,21 @@ fun AddWaterMark(
     when (waterMarkState) {
         WaterMarkState.Image -> {
             val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
-            result?.let {
-                onImageSelected(it.path)
+            result.forEach {
+                it?.let{
+                    onImageSelected(it.path)
+                }
             }
             onFinish()
         }
         WaterMarkState.Video -> {
             val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
-            result?.let {
-                onVideoSelected(it.path)
-            }
+                result.forEach {
+                    it?.let{
+                        onVideoSelected(it.path)
+                    }
+                }
+
             onFinish()
         }
         WaterMarkState.Text -> {

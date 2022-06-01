@@ -113,24 +113,35 @@ public class VideoPlayerJava {
 
     public void addVideoWaterMark(List<Mat> matList, String path) {
         List<Mat> waterMark = this.getFrames(path);
-        for (int i = 0; i < matList.size(); i++) {
-            if (i >= waterMark.size())
-                break;
-            Mat source = matList.get(i);
-            Mat waterMarkImage = this.resize(source.size(), waterMark.get(i));
-            Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
-            Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
+        if(waterMark != null) {
+            for (int i = 0; i < matList.size(); i++) {
+                if (i >= waterMark.size())
+                    break;
+                Mat source = matList.get(i);
+                Mat waterMarkImage = this.resize(source.size(), waterMark.get(i));
+                Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
+                Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
 
+            }
+            System.out.println("Video Water Mark is Added Successfully");
         }
-        System.out.println("Video Water Mark is Added Successfully");
+        else
+            System.out.println("Something Went Wrong");
+
 
     }
 
     public void merge2Videos(List<Mat> matList, String path) {
         List<Mat> matList2 = this.getFrames(path);
-        matList.addAll(matList2);
-        System.out.println("Video is Added Successfully");
-
+        if(matList2 != null) {
+            if (matList.get(0).size() != matList2.get(0).size()) {
+                matList2.replaceAll(it -> resize(matList.get(0).size(), it));
+            }
+            matList.addAll(matList2);
+            System.out.println("Video is Added Successfully");
+        }
+        else
+            System.out.println("Something Went Wrong");
     }
 
     public void moveVideoFrames(List<Mat> matList, int start, int end, int position) {
