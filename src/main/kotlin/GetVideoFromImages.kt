@@ -1,10 +1,5 @@
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,13 +11,13 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun GetVideoFromImages(
     modifier: Modifier,
     addImages: (List<Mat>) -> Unit,
-){
+) {
     var numberOfImages by remember { mutableStateOf("") }
 
     Row(modifier) {
-        CustomTextField(numberOfImages, "Enter Images Number",Modifier.width(200.dp)) { numberOfImages = it }
-        IconButton(onClick = {
-            if(numberOfImages.isNotEmpty() && numberOfImages.all { it.isDigit() }) {
+        CustomTextField(numberOfImages, "Enter Images Number", Modifier.width(200.dp)) { numberOfImages = it }
+        CustomIconButton {
+            if (numberOfImages.isDigit()) {
                 val list = mutableListOf<Mat>()
                 for (i in 1..numberOfImages.toInt()) {
                     val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
@@ -33,9 +28,6 @@ fun GetVideoFromImages(
                     addImages(list)
                 }
             }
-        }
-        ) {
-            Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary)
         }
     }
 }

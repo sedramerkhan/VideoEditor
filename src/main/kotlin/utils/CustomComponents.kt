@@ -1,7 +1,6 @@
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -21,7 +20,16 @@ fun CustomTextField(
             backgroundColor = MaterialTheme.colors.background,
             focusedIndicatorColor = MaterialTheme.colors.onPrimary,
             unfocusedIndicatorColor = MaterialTheme.colors.onPrimary,
-            )
+        )
     )
 
+}
+
+@Composable
+fun CustomIconButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick, modifier = Modifier)
+    { Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary) }
 }

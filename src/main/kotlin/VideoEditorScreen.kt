@@ -57,6 +57,7 @@ fun VideoEditorScreen() {
 
         val modifier = Modifier.padding(horizontal = 5.dp)
         val buttonModifier = Modifier.padding(top = 8.dp).width(200.dp)
+        val textFieldModifier = Modifier.width(80.dp)
         Column(Modifier.padding(25.dp)) {
             if (matList.isNotEmpty()) {
                 println(matList.size)
@@ -84,7 +85,7 @@ fun VideoEditorScreen() {
                 { Text(text = "Merge 2 Videos") }
 
                 Button(onClick = { state = VideoState.VideoFromImages }, modifier =buttonModifier)
-                { Text(text = "get Video from images") }
+                { Text(text = "Get Video from images") }
                 if (state == VideoState.VideoFromImages) {
                     GetVideoFromImages(
                         modifier = modifier,
@@ -100,6 +101,7 @@ fun VideoEditorScreen() {
                 if (state == VideoState.VideoResizing) {
                     ResizeVideo(
                         modifier,
+                        textFieldModifier,
                         resize = { size ->
                             val list = matList.map { player.resize(size, it) }
                             println("resize video from ${matList[0].size()} to $size")
@@ -107,6 +109,28 @@ fun VideoEditorScreen() {
                             matList.addAll(list)
                         }
                     )
+                }
+
+                Button(onClick = { state = VideoState.VideoMoving }, modifier = buttonModifier)
+                { Text(text = "Move Frames") }
+                if (state == VideoState.VideoMoving) {
+                   MoveVideoFrames(
+                       modifier = modifier,
+                       textFieldModifier,
+                       ){ start , end ,position ->
+                        player.moveVideoFrames(matList,start , end ,position)
+                   }
+                }
+
+                Button(onClick = { state = VideoState.VideoCutting }, modifier = buttonModifier)
+                { Text(text = "Delete Frames") }
+                if (state == VideoState.VideoCutting) {
+                    DeleteVideoFrames(
+                        modifier = modifier,
+                        textFieldModifier,
+                        ){ start , end->
+                        player.deleteVideoFrames(matList,start , end)
+                    }
                 }
 
                 Button(onClick = { state = VideoState.FPSChoosing }, modifier =buttonModifier)
@@ -117,6 +141,7 @@ fun VideoEditorScreen() {
                         onFPSChosen = { fps ->
                             println(fps * 10)
                             player.write(matList, fps * 10)
+                            state = VideoState.Nothing
                         }
                     )
                 }

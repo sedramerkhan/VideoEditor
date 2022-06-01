@@ -8,10 +8,10 @@ import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
-fun asImageAsset(image: Mat): ImageBitmap {
+fun Mat.asImageAsset(): ImageBitmap {
     val bytes = MatOfByte()
-    Imgcodecs.imencode(".jpeg", image, bytes)
-    val byteArray = ByteArray((image.total() * image.channels()).toInt())
+    Imgcodecs.imencode(".jpeg", this, bytes)
+    val byteArray = ByteArray((this.total() * this.channels()).toInt())
     bytes.get(0, 0, byteArray)
     return Image.makeFromEncoded(byteArray).toComposeImageBitmap()
 }
@@ -29,3 +29,5 @@ fun openLogFile(fileFilter : FileNameExtensionFilter): File? {
     }
     return result
 }
+
+fun String.isDigit() = isNotEmpty() && all{ it.isDigit()}

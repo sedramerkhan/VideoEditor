@@ -38,7 +38,7 @@ fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
         itemsIndexed(matList) { index, mat ->
             Column {
                 Image(
-                    bitmap = asImageAsset(mat),
+                    bitmap = mat.asImageAsset(),
                     contentDescription = null,
                     modifier = Modifier.width(100.dp).padding(vertical = 10.dp)
                 )

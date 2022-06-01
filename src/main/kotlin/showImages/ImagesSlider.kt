@@ -34,7 +34,7 @@ fun ImageSlider(matList: SnapshotStateList<Mat>){
         }
 
         Image(
-            bitmap = asImageAsset(matList[index]), contentDescription = null
+            bitmap = matList[index].asImageAsset(), contentDescription = null
         )
 
         Text(matList.size.toString())

@@ -53,7 +53,7 @@ public class VideoPlayerJava {
 //                showInFrame(mat);
                 return mat;
             } else {
-                System.out.println("Done");
+                System.out.println("Video Frames are Captured");
                 vCapture.release();
                 return null;
             }
@@ -83,14 +83,13 @@ public class VideoPlayerJava {
         videoWriter = new VideoWriter("C:\\test5.avi", VideoWriter.fourcc('M', 'J', 'P', 'G'),
                 fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
         for (Mat mat : matList) {
-            System.out.println(mat.size());
             videoWriter.write(mat);
         }
         videoWriter.release();
-       System.out.println("Saved To Disk Successfully");
+        System.out.println("Saved To Disk Successfully");
     }
 
-    public void addTextWaterMark(List<Mat> matList,String text) {
+    public void addTextWaterMark(List<Mat> matList, String text) {
         for (Mat source : matList) {
             putText(source, text,
                     new Point(source.rows() / 2, source.cols() / 5),
@@ -112,7 +111,7 @@ public class VideoPlayerJava {
 
     }
 
-    public void addVideoWaterMark(List<Mat> matList,String path) {
+    public void addVideoWaterMark(List<Mat> matList, String path) {
         List<Mat> waterMark = this.getFrames(path);
         for (int i = 0; i < matList.size(); i++) {
             if (i >= waterMark.size())
@@ -127,11 +126,29 @@ public class VideoPlayerJava {
 
     }
 
-    public void merge2Videos(List<Mat> matList,String path){
+    public void merge2Videos(List<Mat> matList, String path) {
         List<Mat> matList2 = this.getFrames(path);
         matList.addAll(matList2);
         System.out.println("Video is Added Successfully");
 
+    }
+
+    public void moveVideoFrames(List<Mat> matList, int start, int end, int position) {
+        if (start < matList.size() && end < matList.size() && position <= matList.size()) {
+            List<Mat> temp = matList.subList(start, end + 1);
+            matList.addAll(position, temp);
+            matList.subList(start, end + 1).clear();
+            System.out.println("Frames Are Moved Successfully");
+        } else
+            System.out.println("Something Went Wrong");
+    }
+
+    public void deleteVideoFrames(List<Mat> matList, int start, int end) {
+        if (start < matList.size() && end < matList.size()) {
+            matList.subList(start, end + 1).clear();
+            System.out.println("Frames Are Deleted Successfully");
+        } else
+            System.out.println("Something Went Wrong");
     }
 
     public Mat resize(Size size, Mat waterMark) {

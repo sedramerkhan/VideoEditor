@@ -14,7 +14,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -63,14 +62,15 @@ fun NumberPicker(
                         animatedOffset.snapTo(animatedOffset.value + deltaY)
                     }
                 },
-                onDragStopped = {  velocity->
+                onDragStopped = { velocity ->
                     coroutineScope.launch {
                         val endValue = animatedOffset.fling(
                             initialVelocity = velocity,
                             animationSpec = exponentialDecay(frictionMultiplier = 20f),
                             adjustTarget = { target ->
                                 val coercedTarget = target % halvedNumbersColumnHeightPx
-                                val coercedAnchors = listOf(-halvedNumbersColumnHeightPx, 0f, halvedNumbersColumnHeightPx)
+                                val coercedAnchors =
+                                    listOf(-halvedNumbersColumnHeightPx, 0f, halvedNumbersColumnHeightPx)
                                 val coercedPoint = coercedAnchors.minByOrNull { abs(it - coercedTarget) }!!
                                 val base = halvedNumbersColumnHeightPx * (target / halvedNumbersColumnHeightPx).toInt()
                                 coercedPoint + base
@@ -88,7 +88,7 @@ fun NumberPicker(
 
         val arrowColor = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.disabled)
 
-        Icon(Icons.Default.KeyboardArrowLeft,null, tint = arrowColor)
+        Icon(Icons.Default.KeyboardArrowLeft, null, tint = arrowColor)
 
         Spacer(modifier = Modifier.height(spacing))
 
@@ -100,18 +100,18 @@ fun NumberPicker(
             val baseLabelModifier = Modifier.align(Alignment.Center)
             ProvideTextStyle(textStyle) {
                 Label(
-                    text = (animatedStateValue*10 - 10).toString(),
+                    text = (animatedStateValue * 10 - 10).toString(),
                     modifier = baseLabelModifier
-                        .offset(x= -halvedNumbersColumnHeight)
+                        .offset(x = -halvedNumbersColumnHeight)
                         .alpha(coercedAnimatedOffset / halvedNumbersColumnHeightPx)
                 )
                 Label(
-                    text = (animatedStateValue *10).toString(),
+                    text = (animatedStateValue * 10).toString(),
                     modifier = baseLabelModifier
                         .alpha(1 - abs(coercedAnimatedOffset) / halvedNumbersColumnHeightPx)
                 )
                 Label(
-                    text = (animatedStateValue*10 + 10).toString(),
+                    text = (animatedStateValue * 10 + 10).toString(),
                     modifier = baseLabelModifier
                         .offset(x = halvedNumbersColumnHeight)
                         .alpha(-coercedAnimatedOffset / halvedNumbersColumnHeightPx)
@@ -121,7 +121,7 @@ fun NumberPicker(
 
         Spacer(modifier = Modifier.height(spacing))
 
-        Icon(Icons.Default.KeyboardArrowRight,null, tint = arrowColor)
+        Icon(Icons.Default.KeyboardArrowRight, null, tint = arrowColor)
     }
 }
 
