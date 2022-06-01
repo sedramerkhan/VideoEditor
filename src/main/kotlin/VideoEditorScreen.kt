@@ -1,8 +1,8 @@
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.opencv.core.Mat
@@ -17,9 +17,9 @@ fun VideoEditorScreen() {
     var path =
         "src/main/resources/test1.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
     val player by remember { mutableStateOf(VideoPlayerJava()) }
-    var matList = remember { mutableStateListOf<Mat>() }
+    val matList = remember { mutableStateListOf<Mat>() }
     var state by remember { mutableStateOf(VideoState.Nothing) }
-    var matListPreviews = remember { mutableStateListOf<Mat>() }
+    val matListPreviews = remember { mutableStateListOf<Mat>() }
 
     //Todo: delete this
     LaunchedEffect(Unit)
@@ -75,7 +75,7 @@ fun VideoEditorScreen() {
             }
 
             Button(onClick = { state = VideoState.VideosMerging }, modifier = buttonModifier)
-            { Text(text = "Merge 2 Videos") }
+            { Text(text = "Merge Videos") }
             if (state == VideoState.VideosMerging) {
                 val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
                 matListPreviews.clone(matList)
@@ -85,9 +85,7 @@ fun VideoEditorScreen() {
                 state = VideoState.Nothing
             }
 
-            Button(onClick = {
-                state = VideoState.VideoFromImages
-            }, modifier = buttonModifier)
+            Button(onClick = { state = VideoState.VideoFromImages }, modifier = buttonModifier)
             { Text(text = "Get video from images") }
             if (state == VideoState.VideoFromImages) {
                 val list = mutableListOf<Mat>()
@@ -159,6 +157,7 @@ fun VideoEditorScreen() {
                     }
                 )
             }
+
             Button(onClick = {
                 println(matListPreviews.size)
                 state = VideoState.Nothing
