@@ -74,6 +74,16 @@ fun VideoEditorScreen() {
                 )
             }
 
+            Button(onClick = { state = VideoState.StickerAdding }, modifier = buttonModifier)
+            { Text(text = "Add Sticker") }
+            if (state == VideoState.StickerAdding){
+                val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
+                result[0]?.let{
+                   player.addSticker(matList,it.path)
+                }
+                state = VideoState.Nothing
+            }
+
             Button(onClick = { state = VideoState.VideosMerging }, modifier = buttonModifier)
             { Text(text = "Merge Videos") }
             if (state == VideoState.VideosMerging) {
