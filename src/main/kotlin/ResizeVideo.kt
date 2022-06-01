@@ -5,7 +5,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.opencv.core.Size
@@ -13,18 +13,18 @@ import org.opencv.core.Size
 @Composable
 fun ResizeVideo(
     modifier: Modifier,
-    width: String,
-    height: String,
-    resize: () -> Unit,
-    onWidthChanged: (String) -> Unit,
-    onHeightChanged: (String) -> Unit,
+    resize: (Size) -> Unit,
 ){
+    var width by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
+
     Row(modifier) {
-        CustomTextField(width, "Width", Modifier.width(80.dp)) {onWidthChanged(it)}
-        CustomTextField(height, "Height", Modifier.width(80.dp)) { onHeightChanged(it) }
+        CustomTextField(width, "Width", Modifier.width(80.dp)) {width = it}
+        CustomTextField(height, "Height", Modifier.width(80.dp)) { height = it }
         IconButton(onClick = {
             if (width.isNotEmpty() && width.all { it.isDigit() } && height.isNotEmpty() && height.all { it.isDigit() }) {
-              resize()
+                val size = Size(width.toDouble(), height.toDouble())
+                resize(size)
             }
         }
         ) { Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary) }

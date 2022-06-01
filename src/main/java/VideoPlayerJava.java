@@ -87,7 +87,7 @@ public class VideoPlayerJava {
             videoWriter.write(mat);
         }
         videoWriter.release();
-
+       System.out.println("Saved To Disk Successfully");
     }
 
     public void addTextWaterMark(List<Mat> matList,String text) {

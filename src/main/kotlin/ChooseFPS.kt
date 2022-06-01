@@ -7,17 +7,18 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun ChooseFPS(
-    fps: MutableState<Int>,
-    onFPSChosen: ()-> Unit,
+    onFPSChosen: (Int)-> Unit,
     modifier: Modifier
 ){
+    val fps = remember { mutableStateOf(2) }
     Row(modifier) {
         Text(
             text = "Choose fps:",
@@ -31,7 +32,7 @@ fun ChooseFPS(
 
         IconButton(
             modifier = Modifier.padding(start = 10.dp),
-            onClick = onFPSChosen) {
+            onClick = { onFPSChosen(fps.value) }) {
             Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary)
         }
     }

@@ -25,12 +25,8 @@ fun VideoEditorScreen() {
     val player by remember { mutableStateOf(VideoPlayerJava()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var showVideo by remember { mutableStateOf(false) }
-    val fps = remember { mutableStateOf(2) }
     var state by remember { mutableStateOf(VideoState.Nothing) }
-    var waterMarkState by remember { mutableStateOf(WaterMarkState.NoWaterMark) }
-    var numberOfImages by remember { mutableStateOf("") }
-    var width by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
+
 
     //Todo: delete this
     LaunchedEffect(Unit)
@@ -60,32 +56,21 @@ fun VideoEditorScreen() {
         }
 
         val modifier = Modifier.padding(horizontal = 5.dp)
+        val buttonModifier = Modifier.padding(top = 8.dp).width(200.dp)
         Column(Modifier.padding(25.dp)) {
             if (matList.isNotEmpty()) {
                 println(matList.size)
                 ImageLazyRow(matList)
 
-                Button(onClick = { state = VideoState.WaterMarkAdding }, modifier = Modifier.padding(top = 8.dp))
-                { Text(text = "    Add WaterMark     ") }
+                Button(onClick = { state = VideoState.WaterMarkAdding }, modifier = buttonModifier)
+                { Text(text = "Add WaterMark") }
                 if (state == VideoState.WaterMarkAdding) {
-                    SimpleRadioButtonComponent(waterMarkState, modifier) { waterMarkState = it }
-
                     AddWaterMark(
-                        waterMarkState,
-                        onImageSelected = {
-                            player.addImageWaterMark(matList, it)
-                            waterMarkState = WaterMarkState.NoWaterMark
-                        },
-                        onVideoSelected = {
-                            player.addVideoWaterMark(matList, it)
-                            waterMarkState = WaterMarkState.NoWaterMark
-                        },
-                        onTextSelected = {
-                            player.addTextWaterMark(matList, it)
-                            waterMarkState = WaterMarkState.NoWaterMark
-                        },
-                        cancel = { waterMarkState = WaterMarkState.NoWaterMark },
                         modifier,
+                        onImageSelected = { player.addImageWaterMark(matList, it) },
+                        onVideoSelected = { player.addVideoWaterMark(matList, it) },
+                        onTextSelected = { player.addTextWaterMark(matList, it) },
+                        onFinish = { state = VideoState.Nothing }
                     )
                 }
 
@@ -95,15 +80,13 @@ fun VideoEditorScreen() {
                     result?.let {
                         player.merge2Videos(matList, it.path)
                     }
-                }, modifier = Modifier.padding(top = 8.dp))
-                { Text(text = "    Merge 2 Videos    ") }
+                }, modifier =buttonModifier)
+                { Text(text = "Merge 2 Videos") }
 
-                Button(onClick = { state = VideoState.VideoFromImages }, modifier = Modifier.padding(top = 8.dp))
+                Button(onClick = { state = VideoState.VideoFromImages }, modifier =buttonModifier)
                 { Text(text = "get Video from images") }
                 if (state == VideoState.VideoFromImages) {
                     GetVideoFromImages(
-                        numberOfImages,
-                        onNumberChanged = { numberOfImages = it },
                         modifier = modifier,
                         addImages = {
                             matList.clear()
@@ -112,37 +95,31 @@ fun VideoEditorScreen() {
                     )
                 }
 
-                Button(onClick = { state = VideoState.VideoResizing }, modifier = Modifier.padding(top = 8.dp))
-                { Text(text = "     Resize Video     ") }
+                Button(onClick = { state = VideoState.VideoResizing }, modifier = buttonModifier)
+                { Text(text = "Resize Video") }
                 if (state == VideoState.VideoResizing) {
-                 ResizeVideo(
-                     modifier,width,height, onWidthChanged = {width = it}, onHeightChanged = {height = it},
-                     resize = {
-                         val size = Size(width.toDouble(), height.toDouble())
-                         val list = matList.map {
-                             player.resize(size, it)
-                         }
-                         println("resize video from ${matList[0].size()} to $size")
-                         matList.clear()
-                         matList.addAll(list)
-                     }
-                 )
-                }
-
-                Button(onClick = { state = VideoState.FPSChoosing }, modifier = Modifier.padding(top = 8.dp))
-                { Text(text = "  Save Video to Disk  ") }
-                if (state == VideoState.FPSChoosing) {
-                    ChooseFPS(
-                        fps,
-                        modifier = modifier,
-                        onFPSChosen = {
-                            println(fps.value * 10)
-                            player.write(matList, fps.value * 10)
+                    ResizeVideo(
+                        modifier,
+                        resize = { size ->
+                            val list = matList.map { player.resize(size, it) }
+                            println("resize video from ${matList[0].size()} to $size")
+                            matList.clear()
+                            matList.addAll(list)
                         }
                     )
                 }
 
-
+                Button(onClick = { state = VideoState.FPSChoosing }, modifier =buttonModifier)
+                { Text(text = "Save Video to Disk") }
+                if (state == VideoState.FPSChoosing) {
+                    ChooseFPS(
+                        modifier = modifier,
+                        onFPSChosen = { fps ->
+                            println(fps * 10)
+                            player.write(matList, fps * 10)
+                        }
+                    )
+                }
             }
         }
 
