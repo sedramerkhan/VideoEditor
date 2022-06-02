@@ -15,7 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun VideoEditorScreen() {
 
     var path =
-        "src/main/resources/test1.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
+        "src/main/resources/test2.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
     val player by remember { mutableStateOf(VideoPlayerJava()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var state by remember { mutableStateOf(VideoState.Nothing) }
@@ -25,6 +25,7 @@ fun VideoEditorScreen() {
     LaunchedEffect(Unit)
     {
         matList.addAll(player.getFrames(path))
+        matListPreviews.clone(matList)
 //        player.openVideo(path)
 //        do {
 //            val mat: Mat? = player.getFrame()
@@ -41,6 +42,7 @@ fun VideoEditorScreen() {
         ) {
             if (path.isNotEmpty()) {
                 matList.addAll(player.getFrames(path))
+                matListPreviews.clone(matList)
             }
         }
     } else {
@@ -78,8 +80,10 @@ fun VideoEditorScreen() {
             { Text(text = "Add Sticker") }
             if (state == VideoState.StickerAdding){
                 val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
-                result[0]?.let{
-                   player.addSticker(matList,it.path)
+                if(result.isNotEmpty()) {
+                    result[0]?.let {
+                        player.addSticker(matList, it.path)
+                    }
                 }
                 state = VideoState.Nothing
             }
@@ -106,8 +110,10 @@ fun VideoEditorScreen() {
                         list.add(image)
                     }
                 }
-                matList.clear()
-                matList.addAll(list.map { image -> player.resize(Size(350.0, 350.0), image) })
+                if(result.isNotEmpty()) {
+                    matList.clear()
+                    matList.addAll(list.map { image -> player.resize(Size(350.0, 350.0), image) })
+                }
                 state = VideoState.Nothing
             }
 
