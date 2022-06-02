@@ -55,6 +55,7 @@ fun VideoEditorScreen() {
         val textFieldModifier = Modifier.width(80.dp)
 
         var i by remember { mutableStateOf(0) }
+
         LaunchedEffect(state) {
             i =0
             while (state == VideoState.Nothing) {
@@ -93,6 +94,7 @@ fun VideoEditorScreen() {
                 Button(onClick = { state = VideoState.StickerAdding }, modifier = buttonModifier)
                 { Text(text = "Add Sticker") }
                 if (state == VideoState.StickerAdding) {
+                    javacv().extractAudioFromVedio()
                     val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
                     if (result.isNotEmpty()) {
                         result[0]?.let {

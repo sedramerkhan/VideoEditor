@@ -19,6 +19,23 @@ repositories {
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation(files("src/main/resources/java/opencv-455.jar"))
+    
+    implementation("org.bytedeco:javacv-platform:1.3.1")
+//    implementation(group = "org.bytedeco", name = "javacv", version = "0.9")
+//    implementation(
+//        group = "org.bytedeco.javacpp-presets",
+//        name = "opencv",
+//        version = "2.4.9-0.9",
+//        classifier = "android-arm"
+//    )
+//    implementation(
+//        group = "org.bytedeco.javacpp-presets",
+//        name = "ffmpeg",
+//        version = "2.3-0.9",
+//        classifier = "android-arm"
+//    )
+
+
 
 }
 
