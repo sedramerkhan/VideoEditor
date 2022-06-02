@@ -7,5 +7,6 @@ public enum VideoState {
     VideoFromImages,
     VideoResizing,
     VideoMoving,
-    StickerAdding
+    StickerAdding,
+    VoiceAdding
 }

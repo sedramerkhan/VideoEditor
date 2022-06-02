@@ -20,7 +20,7 @@ fun Mat.asImageAsset(): ImageBitmap {
 
 fun openLogFile(fileFilter : FileNameExtensionFilter): MutableList<File?> {
     val result: MutableList<File?> = mutableListOf()
-    JFileChooser("${System.getProperty("user.home")}/Desktop").apply {
+    JFileChooser(File("src/main/resources").absolutePath).apply {
         fileSelectionMode = JFileChooser.FILES_ONLY
         addChoosableFileFilter(fileFilter)
         isAcceptAllFileFilterUsed = true
@@ -31,6 +31,19 @@ fun openLogFile(fileFilter : FileNameExtensionFilter): MutableList<File?> {
     }
     return result
 }
+
+fun openLogFileDir(): File? {
+    var result: File?
+    JFileChooser("${System.getProperty("user.home")}/Desktop").apply {
+        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+        isAcceptAllFileFilterUsed = true
+        showOpenDialog(null)
+        result =selectedFile
+        println("The Path of Video is ${selectedFile}")
+    }
+    return result
+}
+
 
 fun String.isDigit() = isNotEmpty() && all{ it.isDigit()}
 
