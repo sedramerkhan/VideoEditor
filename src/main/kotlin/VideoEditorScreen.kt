@@ -18,7 +18,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 fun VideoEditorScreen() {
 
     var path =
-        "src/main/resources/test2.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
+        "src/main/resources/test1.mp4" //"C:\\Users\\Sedra\\Desktop\\Files\\Montage Course\\RBCs_V6\\Render\\sph.mp4"
     val player by remember { mutableStateOf(VideoPlayerJava()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var state by remember { mutableStateOf(VideoState.Nothing) }
@@ -94,7 +94,8 @@ fun VideoEditorScreen() {
                 Button(onClick = { state = VideoState.StickerAdding }, modifier = buttonModifier)
                 { Text(text = "Add Sticker") }
                 if (state == VideoState.StickerAdding) {
-                    javacv().extractAudioFromVedio()
+//                    javacv().extractAudioFromVedio()
+                    javacv().createVideoWithAudioAndPhoto()
                     val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
                     if (result.isNotEmpty()) {
                         result[0]?.let {
