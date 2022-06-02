@@ -4,15 +4,15 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
+
 import java.io.File;
 
 public class Audio {
 
-    public void extractAudioFromVideo()
-    {
+    public void extractAudioFromVideo() {
         String videoPath = "C:\\Users\\Sedra\\Desktop\\undo.mp4";
-        String extractAudio="C:\\Users\\Sedra\\Desktop\\legend_never_die.mp3";
-        try{
+        String extractAudio = "C:\\Users\\Sedra\\Desktop\\legend_never_die.mp3";
+        try {
             //check the audio file exist or not ,remove it if exist
             File extractAudioFile = new File(extractAudio);
             if (extractAudioFile.exists()) {
@@ -32,14 +32,14 @@ public class Audio {
             //start
             recorder.start();
             //load video
-            int i=0;
+            int i = 0;
             FFmpegFrameGrabber grabber = FFmpegFrameGrabber.createDefault(videoPath);
             grabber.start();
             Frame f;
             //get audio sample and record it
             while ((f = grabber.grabSamples()) != null) {
                 i++;
-                System.out.println("frame "+i);
+                System.out.println("frame " + i);
                 recorder.record(f);
             }
             // stop to save
@@ -48,19 +48,19 @@ public class Audio {
             //output audio path
 
         } catch (Exception e) {
-            e.printStackTrace();        }
+            e.printStackTrace();
+        }
     }
 
-    public void createVideoWithAudioAndPhoto(String audioPath, String videoPath,String videoName,int fps)
-    {
+    public void createVideoWithAudioAndPhoto(String audioPath, String videoPath, String videoName, int fps) {
 //        String videoPath="C:\\test5.avi";
 //        String audioPath="src/main/resources/music.mp3";
         String newVideoName = "withSound.mp4";
         String videoFormat = "mp4";
         //new video file path
-        String videoGenPath = videoPath+newVideoName;
+        String videoGenPath = videoPath + newVideoName;
         //create video grabber
-        FrameGrabber videoGrabber = new FFmpegFrameGrabber(videoPath+videoName);
+        FrameGrabber videoGrabber = new FFmpegFrameGrabber(videoPath + videoName);
         //create audio grabber
         FrameGrabber audioGrabber = new FFmpegFrameGrabber(audioPath);
         try {
@@ -82,8 +82,8 @@ public class Audio {
             //record stard
             recorder.start();
             //output basic info
-            System.out.println("Video Frame number: "+ videoGrabber.getFrameNumber() +" Length in frames: " + videoGrabber.getLengthInFrames()+ "  Length in time: "+ videoGrabber.getLengthInTime());
-            System.out.println("Audio Frame number: "+ audioGrabber.getFrameNumber() +"Length in frames: " + audioGrabber.getLengthInFrames() + " Length in time:{} "+audioGrabber.getLengthInTime());
+            System.out.println("Video Frame number: " + videoGrabber.getFrameNumber() + " Length in frames: " + videoGrabber.getLengthInFrames() + "  Length in time: " + videoGrabber.getLengthInTime());
+            System.out.println("Audio Frame number: " + audioGrabber.getFrameNumber() + "Length in frames: " + audioGrabber.getLengthInFrames() + " Length in time:{} " + audioGrabber.getLengthInTime());
             Frame frame;
             int counter = 0;
             //record video frame
@@ -91,21 +91,21 @@ public class Audio {
                 counter++;
                 recorder.record(frame);
             }
-            System.out.println("counter in video "+ counter);
-            counter*=2;
+            System.out.println("counter in video " + counter);
+            counter *= 2;
             //record audio frame
-            while (counter >=0 &&(frame = audioGrabber.grabFrame()) != null) {
+            while (counter >= 0 && (frame = audioGrabber.grabFrame()) != null) {
                 counter--;
                 recorder.record(frame);
             }
-            System.out.println("counter in audio "+counter);
+            System.out.println("counter in audio " + counter);
             //complete
             recorder.stop();
             //output path
             System.out.println(videoGenPath);
         } catch (Exception e) {
 //           System.out.println(e);
-        }finally{
+        } finally {
             try {
                 videoGrabber.stop();
                 audioGrabber.stop();

@@ -8,42 +8,55 @@ import javax.swing.filechooser.FileNameExtensionFilter
 @Composable
 fun AddWaterMark(
     modifier: Modifier,
-    onImageSelected: (String) -> Unit,
-    onVideoSelected: (String) -> Unit,
-    onTextSelected: (String) -> Unit,
+    onImageSelected: (String, Double) -> Unit,
+    onVideoSelected: (String, Double) -> Unit,
+    onTextSelected: (String, Double) -> Unit,
     onFinish: () -> Unit,
 ) {
     var text by remember { mutableStateOf("") }
-    var waterMarkState by remember { mutableStateOf(WaterMarkState.NoWaterMark) }
-
+    var waterMarkState by remember { mutableStateOf(WaterMarkState.Nothing) }
     SimpleRadioButtonComponent(waterMarkState, modifier) { waterMarkState = it }
 
     when (waterMarkState) {
         WaterMarkState.Image -> {
-            val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
-            if(result.isNotEmpty()) {
-                result[0]?.let {
-                    onImageSelected(it.path)
+            EnterOpacity { alpha ->
+                val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
+                if (result.isNotEmpty()) {
+                    result[0]?.let {
+
+                        onImageSelected(it.path, alpha)
+                        onFinish()
+                    } ?: run {
+                        onFinish()
+                    }
                 }
-                onFinish()
+
             }
         }
         WaterMarkState.Video -> {
-            val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
-            if(result.isNotEmpty()) {
-                result[0]?.let {
-                    onVideoSelected(it.path)
+            EnterOpacity { alpha ->
+                val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
+                if (result.isNotEmpty()) {
+                    result[0]?.let {
+                        onVideoSelected(it.path, alpha)
+
+                        onFinish()
+                    } ?: run {
+                        onFinish()
+                    }
                 }
             }
-            onFinish()
         }
         WaterMarkState.Text -> {
-            Row(modifier = modifier,) {
+            Row(modifier = modifier) {
                 CustomTextField(text, "Enter WaterMark", Modifier.width(200.dp)) { text = it }
-
+                var alpha by remember { mutableStateOf("") }
+                CustomTextField(alpha, "Alpha", modifier = Modifier.width(80.dp)) {
+                    alpha = it
+                }
                 CustomIconButton {
-                    if (text.isNotEmpty()) {
-                        onTextSelected(text)
+                    if (text.isNotEmpty() && alpha.isDigit()) {
+                        onTextSelected(text, alpha.toDouble())
                         onFinish()
                     }
                 }
@@ -51,4 +64,23 @@ fun AddWaterMark(
         }
         else -> {}
     }
+}
+
+@Composable
+fun EnterOpacity(
+    addWaterMark: (Double) -> Unit
+) {
+    var alpha by remember { mutableStateOf("") }
+    Row {
+        CustomTextField(alpha, "Alpha", modifier = Modifier.width(80.dp)) {
+            alpha = it
+        }
+        CustomIconButton {
+            if (alpha.isDigit()) {
+                val alphaNum = if (alpha.toDouble() < 0 || alpha.toDouble() > 1) 1.0 else alpha.toDouble()
+                addWaterMark(alphaNum)
+            }
+        }
+    }
+
 }

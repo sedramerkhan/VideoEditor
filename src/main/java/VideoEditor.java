@@ -89,7 +89,7 @@ public class VideoEditor {
         System.out.println("Saved To Disk Successfully");
     }
 
-    public void addTextWaterMark(List<Mat> matList, String text) {
+    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
         for (Mat source : matList) {
             putText(source, text,
                     new Point(source.rows() / 2, source.cols() / 5),
@@ -99,26 +99,26 @@ public class VideoEditor {
         System.out.println("Text Water Mark is Added Successfully");
     }
 
-    public void addImageWaterMark(List<Mat> matList, String path) {
+    public void addImageWaterMark(List<Mat> matList, String path,double alpha) {
         Mat waterMark = Imgcodecs.imread(path);
         waterMark = this.resize(matList.get(0).size(), waterMark);
         System.out.println("water mark image: " + waterMark.size());
         for (Mat source : matList) {
             Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
-            Core.addWeighted(source.submat(ROI), 0.8, waterMark, 0.2, 1, source.submat(ROI));
+            Core.addWeighted(source.submat(ROI), alpha, waterMark, 1-alpha, 1, source.submat(ROI));
         }
         System.out.println("Image Water Mark is Added Successfully");
 
     }
 
-    public void addVideoWaterMark(List<Mat> matList, String path) {
+    public void addVideoWaterMark(List<Mat> matList, String path,double alpha) {
         List<Mat> waterMark = this.getFrames(path);
         if(waterMark != null) {
             for (int i = 0; i <matList.size(); i++) {
                 Mat source = matList.get(i);
                 Mat waterMarkImage = this.resize(source.size(), waterMark.get(i%waterMark.size()));
                 Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
-                Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
+                Core.addWeighted(source.submat(ROI), alpha, waterMarkImage, 1-alpha, 1, source.submat(ROI));
 
             }
             System.out.println("Video Water Mark is Added Successfully");

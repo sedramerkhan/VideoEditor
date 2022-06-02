@@ -15,10 +15,10 @@ fun MoveVideoFrames(
     var position by remember { mutableStateOf("") }
 
     Row(modifier) {
-        CustomTextField(text = start, placeholder = "Start", modifier =textFieldModifier) {
+        CustomTextField(text = start, placeholder = "Start", modifier =Modifier.width(70.dp)) {
             start = it
         }
-        CustomTextField(text = end, placeholder = "End", modifier = textFieldModifier) {
+        CustomTextField(text = end, placeholder = "End", modifier = Modifier.width(70.dp)) {
             end = it
         }
         CustomTextField(text = position, placeholder = "Position", modifier = Modifier.width(100.dp)) {

@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -64,27 +65,29 @@ fun VideoEditorScreen() {
             }
         }
         Row(
-            Modifier.fillMaxSize().padding(25.dp)
+            Modifier.fillMaxSize().padding(vertical = 16.dp, horizontal = 25.dp)
         ) {
-            Column() {
+            Column {
 
-                Converter().toBufferedImage(matList[0])
-                Button(onClick = { state = VideoState.WaterMarkAdding }, modifier = buttonModifier)
-                { Text(text = "Add WaterMark") }
+                Row {
+                    Button(onClick = { state = VideoState.WaterMarkAdding }, modifier = buttonModifier)
+                    { Text(text = "Add WaterMark") }
+                    Spacer(modifier.width(90.dp))
+                }
                 if (state == VideoState.WaterMarkAdding) {
                     AddWaterMark(
                         modifier,
-                        onImageSelected = {
+                        onImageSelected = { path, alpha ->
                             matListPreviews.clone(matList)
-                            editor.addImageWaterMark(matList, it)
+                            editor.addImageWaterMark(matList, path, alpha)
                         },
-                        onVideoSelected = {
+                        onVideoSelected = { path, alpha ->
                             matListPreviews.clone(matList)
-                            editor.addVideoWaterMark(matList, it)
+                            editor.addVideoWaterMark(matList, path, alpha)
                         },
-                        onTextSelected = {
+                        onTextSelected = { path, alpha ->
                             matListPreviews.clone(matList)
-                            editor.addTextWaterMark(matList, it)
+                            editor.addTextWaterMark(matList, path, alpha)
                         },
                         onFinish = { state = VideoState.Nothing }
                     )
@@ -182,7 +185,7 @@ fun VideoEditorScreen() {
                         val result = openLogFile(FileNameExtensionFilter("Audio", "mp3"))
                         if (result.isNotEmpty()) {
                             result[0]?.let {
-                                Audio().createVideoWithAudioAndPhoto(it.path, videoPath , videoName, fps.value)
+                                Audio().createVideoWithAudioAndPhoto(it.path, videoPath, videoName, fps.value)
                             }
                         }
                     }
@@ -225,19 +228,16 @@ fun VideoEditorScreen() {
 //                println(matList.size)
                 ImageLazyRow(matList, Modifier)
 
-                Spacer(modifier.height(30.dp))
-
-                Image(
-                    bitmap = matList[i % matList.size].asImageAsset(),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.size(400.dp)
-                )
+                Box(modifier.fillMaxSize()) {
+                    Image(
+                        bitmap = matList[i % matList.size].asImageAsset(),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.height(400.dp).width(600.dp).align(Alignment.Center)
+                    )
+                }
             }
-
-
         }
-
     }
 }
 

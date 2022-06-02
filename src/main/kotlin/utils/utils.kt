@@ -27,7 +27,7 @@ fun openLogFile(fileFilter : FileNameExtensionFilter): MutableList<File?> {
         isMultiSelectionEnabled = true
         showOpenDialog(null)
         result.addAll(selectedFiles)
-        println("${selectedFiles.size}files is/are selected")
+        println("${selectedFiles.size} files is/are selected")
     }
     return result
 }
@@ -45,7 +45,7 @@ fun openLogFileDir(): File? {
 }
 
 
-fun String.isDigit() = isNotEmpty() && all{ it.isDigit()}
+fun String.isDigit() = isNotEmpty() && all{ it.isDigit() || it == '.' }
 
 fun SnapshotStateList<Mat>.clone(list: SnapshotStateList<Mat>) {
     this.clear()

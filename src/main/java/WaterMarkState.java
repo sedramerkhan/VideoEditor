@@ -1,3 +1,3 @@
 public enum WaterMarkState {
-    Image,Video,Text,NoWaterMark;
+    Image,Video,Text, Nothing;
 }

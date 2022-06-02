@@ -50,8 +50,6 @@ fun ImageLazyRow(matList: SnapshotStateList<Mat>, modifier: Modifier) {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
-
-//            Spacer(Modifier.width(16.dp))
         }
     }
 }

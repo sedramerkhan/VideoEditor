@@ -28,17 +28,19 @@ fun SimpleRadioButtonComponent(
 
             ) {
                 RadioButton(
-                    selected = (text == selectedOption), modifier = Modifier.size(30.dp),
+                    selected = (text == selectedOption), modifier = Modifier.size(20.dp),
                     onClick = {
                         onOptionSelected(text)
                         println(text)
                     }
                 )
+                Spacer(Modifier.width(2.dp))
                 Text(
-                    text = text.name,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    text = text.name.toLowerCase(),
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.subtitle1
                 )
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(8.dp))
             }
         }
 
