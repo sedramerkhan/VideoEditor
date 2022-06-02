@@ -14,18 +14,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.opencv.core.Mat
 
 @Composable
-fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
+fun ImageLazyRow(matList: SnapshotStateList<Mat>, modifier: Modifier) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 //    val list = matList.filterIndexed { index, _ -> index % 3 == 0 }
     LazyRow(
         state = scrollState,
-        modifier = Modifier
+        modifier = modifier
             .draggable(
                 orientation = Orientation.Horizontal,
                 state = rememberDraggableState { delta ->
@@ -40,7 +41,8 @@ fun ImageLazyRow(matList: SnapshotStateList<Mat>) {
                 Image(
                     bitmap = mat.asImageAsset(),
                     contentDescription = null,
-                    modifier = Modifier.width(100.dp).padding(vertical = 10.dp)
+                    modifier = Modifier.size(100.dp).padding(vertical = 10.dp),
+                    contentScale = ContentScale.FillBounds
                 )
                 Text(
                     index.toString(),
