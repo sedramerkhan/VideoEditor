@@ -16,7 +16,7 @@ import static org.opencv.imgproc.Imgproc.putText;
 public class VideoPlayerJava {
 
     VideoCapture vCapture;
-    Mat mat;
+
     VideoWriter videoWriter;
 
     public VideoPlayerJava() {
@@ -42,7 +42,7 @@ public class VideoPlayerJava {
     }
 
     public Mat getFrame() {
-        mat = new Mat();
+        Mat mat = new Mat();
         if (!vCapture.isOpened()) {
             System.out.println("media failed to open");
             return null;
@@ -114,11 +114,9 @@ public class VideoPlayerJava {
     public void addVideoWaterMark(List<Mat> matList, String path) {
         List<Mat> waterMark = this.getFrames(path);
         if(waterMark != null) {
-            for (int i = 0; i < matList.size(); i++) {
-                if (i >= waterMark.size())
-                    break;
+            for (int i = 0; i <matList.size(); i++) {
                 Mat source = matList.get(i);
-                Mat waterMarkImage = this.resize(source.size(), waterMark.get(i));
+                Mat waterMarkImage = this.resize(source.size(), waterMark.get(i%waterMark.size()));
                 Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
                 Core.addWeighted(source.submat(ROI), 0.8, waterMarkImage, 0.2, 1, source.submat(ROI));
 

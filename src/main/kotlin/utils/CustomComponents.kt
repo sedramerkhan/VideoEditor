@@ -30,6 +30,6 @@ fun CustomIconButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick, modifier = Modifier)
+    IconButton(onClick = onClick, modifier = modifier)
     { Icon(Icons.Default.Done, null, tint = MaterialTheme.colors.secondary) }
 }
