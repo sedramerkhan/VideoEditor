@@ -72,7 +72,7 @@ public class VideoEditor {
                 list.add(new Mat());
                 vCapture.retrieve(list.get(list.size() - 1));
             }
-            System.out.println("Done");
+            System.out.println("Getting Frames is Done Successfuly");
             vCapture.release();
             return list;
         }

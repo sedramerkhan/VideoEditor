@@ -58,7 +58,7 @@ public class Audio {
         String newVideoName = "withSound.mp4";
         String videoFormat = "mp4";
         //new video file path
-        String videoGenPath = videoPath + newVideoName;
+        String videoGenPath = videoPath +"\\"+ newVideoName;
         //create video grabber
         FrameGrabber videoGrabber = new FFmpegFrameGrabber(videoPath + videoName);
         //create audio grabber
@@ -91,7 +91,7 @@ public class Audio {
                 counter++;
                 recorder.record(frame);
             }
-            System.out.println("counter in video " + counter);
+            System.out.println("\ncounter in video " + counter);
             counter *= 2;
             //record audio frame
             while (counter >= 0 && (frame = audioGrabber.grabFrame()) != null) {
@@ -102,7 +102,7 @@ public class Audio {
             //complete
             recorder.stop();
             //output path
-            System.out.println(videoGenPath);
+            System.out.println("The Audio is Saved in "+videoGenPath);
         } catch (Exception e) {
 //           System.out.println(e);
         } finally {

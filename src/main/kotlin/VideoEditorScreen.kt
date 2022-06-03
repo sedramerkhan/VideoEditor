@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -16,14 +17,14 @@ import javax.swing.filechooser.FileNameExtensionFilter
 @Composable
 fun VideoEditorScreen() {
 
-    var path = "src/main/resources/test1.mp4"
+    var path by remember { mutableStateOf("src/main/resources/test1.mp4") }
     val editor by remember { mutableStateOf(VideoEditor()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var state by remember { mutableStateOf(VideoState.Nothing) }
     val matListPreviews = remember { mutableStateListOf<Mat>() }
     val fps = remember { mutableStateOf(3) }
     var videoPath by remember { mutableStateOf("C:\\") }
-    var savedVideo by remember { mutableStateOf(false) }
+    var audioPath by remember { mutableStateOf("") }
     val videoName = "\\withoutSound1.avi"
     //Todo: delete this
     LaunchedEffect(Unit)
@@ -178,24 +179,19 @@ fun VideoEditorScreen() {
                     }
                 }
 
-                Button(onClick = { state = VideoState.VoiceAdding }, modifier = buttonModifier)
+                Button(onClick = { state = VideoState.AudioAdding }, modifier = buttonModifier)
                 { Text(text = "Add Audio") }
-                if (state == VideoState.VoiceAdding) {
-                    if (savedVideo) {
-                        val result = openLogFile(FileNameExtensionFilter("Audio", "mp3"))
-                        if (result.isNotEmpty()) {
-                            result[0]?.let {
-                                Audio().createVideoWithAudioAndPhoto(it.path, videoPath, videoName, fps.value)
-                            }
+                if (state == VideoState.AudioAdding) {
+                    val result = openLogFile(FileNameExtensionFilter("Audio", "mp3"))
+                    if (result.isNotEmpty()) {
+                        result[0]?.let {
+                            audioPath = it.path
+                            state = VideoState.VideoSavingWithAudio
                         }
-                    }
-                    state = VideoState.Nothing
+                    } else
+                        state = VideoState.Nothing
                 }
-
-
-                Button(onClick = { state = VideoState.FPSChoosing }, modifier = buttonModifier)
-                { Text(text = "Save Video to Disk") }
-                if (state == VideoState.FPSChoosing) {
+                if (state == VideoState.VideoSavingWithAudio) {
                     ChooseFPS(
                         fps = fps,
                         modifier = modifier,
@@ -206,7 +202,26 @@ fun VideoEditorScreen() {
                                 matListPreviews.clone(matList)
                                 videoPath = it.path
                                 editor.write(matList, videoPath + videoName, fps.value * 10)
-                                savedVideo = true
+                                Audio().createVideoWithAudioAndPhoto(audioPath, videoPath, videoName, fps.value)
+                            }
+                            state = VideoState.Nothing
+                        }
+                    )
+                }
+
+                Button(onClick = { state = VideoState.VideoSaving }, modifier = buttonModifier)
+                { Text(text = "Save Video to Disk") }
+                if (state == VideoState.VideoSaving) {
+                    ChooseFPS(
+                        fps = fps,
+                        modifier = modifier,
+                        onFPSChosen = {
+                            println(fps.value * 10)
+                            val result = openLogFileDir()
+                            result?.let {
+                                matListPreviews.clone(matList)
+                                videoPath = it.path
+                                editor.write(matList, videoPath + videoName, fps.value * 10)
                             }
                             state = VideoState.Nothing
                         }
@@ -224,7 +239,7 @@ fun VideoEditorScreen() {
             }
 
             Spacer(Modifier.width(30.dp))
-            Column() {
+            Column {
 //                println(matList.size)
                 ImageLazyRow(matList, Modifier)
 
