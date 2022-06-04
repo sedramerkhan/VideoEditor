@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import org.opencv.core.Mat
 import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs.imread
+import org.opencv.imgcodecs.Imgcodecs.imwrite
 import javax.swing.filechooser.FileNameExtensionFilter
 
 
@@ -25,7 +26,7 @@ fun VideoEditorScreen() {
     val fps = remember { mutableStateOf(3) }
     var videoPath by remember { mutableStateOf("C:\\") }
     var audioPath by remember { mutableStateOf("") }
-    val videoName = "\\withoutSound1.avi"
+    val videoName = "\\withoutSound1.mp4"
     //Todo: delete this
     LaunchedEffect(Unit)
     {

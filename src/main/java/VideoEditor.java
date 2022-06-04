@@ -80,7 +80,7 @@ public class VideoEditor {
 
     public void write(List<Mat> matList,String videoPath, int fps) {
 
-        videoWriter = new VideoWriter(videoPath, VideoWriter.fourcc('M', 'J', 'P', 'G'),
+        videoWriter = new VideoWriter(videoPath, VideoWriter.fourcc('X', '2', '6', '4'),
                 fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
         for (Mat mat : matList) {
             videoWriter.write(mat);
