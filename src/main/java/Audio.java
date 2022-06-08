@@ -58,7 +58,7 @@ public class Audio {
         String newVideoName = "withSound.mp4";
         String videoFormat = "mp4";
         //new video file path
-        String videoGenPath = videoPath +"\\"+ newVideoName;
+        String videoGenPath = videoPath + "\\" + newVideoName;
         //create video grabber
         FrameGrabber videoGrabber = new FFmpegFrameGrabber(videoPath + videoName);
         //create audio grabber
@@ -102,7 +102,8 @@ public class Audio {
             //complete
             recorder.stop();
             //output path
-            System.out.println("The Audio is Saved in "+videoGenPath);
+            System.out.println("The Audio is Saved in ");
+            System.out.println(new File(videoGenPath));
         } catch (Exception e) {
 //           System.out.println(e);
         } finally {

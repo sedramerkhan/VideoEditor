@@ -18,7 +18,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 @Composable
 fun VideoEditorScreen() {
 
-    var path by remember { mutableStateOf("src/main/resources/test1.mp4") }
+    var path by remember { mutableStateOf("src/main/resources/undoComplete.mp4") }
     val editor by remember { mutableStateOf(VideoEditor()) }
     val matList = remember { mutableStateListOf<Mat>() }
     var state by remember { mutableStateOf(VideoState.Nothing) }
@@ -32,6 +32,7 @@ fun VideoEditorScreen() {
     {
         matList.addAll(editor.getFrames(path))
         matListPreviews.clone(matList)
+        println(matList.size)
 //        player.openVideo(path)
 //        do {
 //            val mat: Mat? = player.getFrame()
@@ -89,7 +90,7 @@ fun VideoEditorScreen() {
                         },
                         onTextSelected = { path, alpha ->
                             matListPreviews.clone(matList)
-                            editor.addTextWaterMark(matList, path, alpha)
+                            editor.addTextWaterMark(matList, path, alpha.toFloat())
                         },
                         onFinish = { state = VideoState.Nothing }
                     )

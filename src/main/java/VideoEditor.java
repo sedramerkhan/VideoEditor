@@ -7,6 +7,10 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,23 +93,61 @@ public class VideoEditor {
         System.out.println("Saved To Disk Successfully");
     }
 
-    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
-        for (Mat source : matList) {
+//    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
+//        for (Mat source : matList) {
+//            putText(source, text,
+//                    new Point(source.rows() / 2, source.cols() / 5),
+//                    Imgproc.FONT_HERSHEY_PLAIN, 1.0,
+//                    new Scalar(255, 150, 200, 30), 1);
+//        }
+//        System.out.println("Text Water Mark is Added Successfully");
+//    }
+    private static Mat addTextWatermark(String text, Mat source, float alpha) throws IOException, IOException {
+        BufferedImage image = Converter.toBufferedImage(source);
+
+        // determine image type and handle correct transparency
+        // initializes necessary graphic properties
+        Graphics2D w = (Graphics2D) image.getGraphics();
+        //       w.drawImage(image, 0, 0, null);
+        AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        w.setComposite(alphaChannel);
+        w.setColor(Color.GRAY);
+        w.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 26));
+        FontMetrics fontMetrics = w.getFontMetrics();
+        Rectangle2D rect = fontMetrics.getStringBounds(text, w);
+
+        // calculate center of the image
+        int centerX = (image.getWidth() - (int) rect.getWidth()) / 2;
+        int centerY = image.getHeight() / 2;
+
+        // add text overlay to the image
+        w.drawString(text, centerX, centerY);
+        //  Imgcodecs.imwrite("D:\\test.jpg",Converter.toMat(image));
+
+        w.dispose();
+        return Converter.toMat(image);
+    }
+    public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
+        for (int i = 0  ;i < matList.size();i++) {
+            Mat source= matList.get(i);
+            matList.set(i,addTextWatermark(text,source,alpha));
+            /*
             putText(source, text,
                     new Point(source.rows() / 2, source.cols() / 5),
                     Imgproc.FONT_HERSHEY_PLAIN, 1.0,
                     new Scalar(255, 150, 200, 30), 1);
-        }
+*/        }
         System.out.println("Text Water Mark is Added Successfully");
     }
-
     public void addImageWaterMark(List<Mat> matList, String path,double alpha) {
         Mat waterMark = Imgcodecs.imread(path);
         waterMark = this.resize(matList.get(0).size(), waterMark);
         System.out.println("water mark image: " + waterMark.size());
-        for (Mat source : matList) {
+        for (int i =0; i< matList.size();i++) {
+            Mat source= matList.get(i).clone();
             Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
             Core.addWeighted(source.submat(ROI), alpha, waterMark, 1-alpha, 1, source.submat(ROI));
+            matList.set(i,source);
         }
         System.out.println("Image Water Mark is Added Successfully");
 
@@ -115,11 +157,11 @@ public class VideoEditor {
         List<Mat> waterMark = this.getFrames(path);
         if(waterMark != null) {
             for (int i = 0; i <matList.size(); i++) {
-                Mat source = matList.get(i);
+                Mat source = matList.get(i).clone();
                 Mat waterMarkImage = this.resize(source.size(), waterMark.get(i%waterMark.size()));
                 Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
                 Core.addWeighted(source.submat(ROI), alpha, waterMarkImage, 1-alpha, 1, source.submat(ROI));
-
+                matList.set(i,source);
             }
             System.out.println("Video Water Mark is Added Successfully");
         }
@@ -131,9 +173,12 @@ public class VideoEditor {
         Mat waterMark = Imgcodecs.imread(path);
 
         waterMark = this.resize(new Size(50,50), waterMark);
-        for (Mat source : matList) {
+        for (int i =0; i< matList.size();i++) {
+            Mat source= matList.get(i).clone();
             Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, waterMark.cols(), waterMark.rows());
             Core.addWeighted(source.submat(ROI), 0, waterMark, 1, 1, source.submat(ROI));
+            matList.set(i,source);
+
         }
         System.out.println("Image Water Mark is Added Successfully");
 
