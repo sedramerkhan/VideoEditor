@@ -4,7 +4,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.V
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -49,13 +48,16 @@ fun VideoEditorScreen() {
         val textFieldModifier = Modifier.width(80.dp)
 
         var i by remember { mutableStateOf(0) }
+        var time by remember { mutableStateOf(0) }
 
         LaunchedEffect(state) {
             i = 0
             while (state == VideoState.VideoPlaying) {
                 if (i < matList.size - 1) i++
                 else i = 0
-                delay((1000 / (fps.value * 10)).toLong())
+                val fpsValue = fps.value * 10
+                delay((1000 / fpsValue).toLong())
+                time = i / fpsValue
             }
         }
         Row(
@@ -227,13 +229,27 @@ fun VideoEditorScreen() {
                 }, modifier = buttonModifier)
                 { Text(text = "Undo ") }
 
+
+                Button(modifier = buttonModifier, onClick = {
+                    val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
+                    if (result.isNotEmpty()) {
+                        result[0]?.let {
+                            matListPreviews.clone(matList)
+                            matList.clear()
+                            matList.addAll(editor.getFrames(it.path))
+                        }
+                    }
+                })
+                {
+                    Text("Get New Video")
+                }
+
             }
 
             Spacer(Modifier.width(30.dp))
             Column {
 
                 ImageLazyRow(matList, Modifier)
-
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -245,13 +261,22 @@ fun VideoEditorScreen() {
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier.height(400.dp).width(600.dp)
                     )
-                    Button(modifier = buttonModifier, onClick = {
-                        state =
-                            if (state != VideoState.VideoPlaying) VideoState.VideoPlaying else VideoState.VideoPausing
-                    })
+                    Row()
                     {
-                        val text = if (state != VideoState.VideoPlaying) "Play" else "Pause"
-                        Text("$text Video")
+                        Button(modifier = buttonModifier, onClick = {
+                            state =
+                                if (state != VideoState.VideoPlaying) VideoState.VideoPlaying else VideoState.VideoPausing
+                        })
+                        {
+                            val text = if (state != VideoState.VideoPlaying) "Play" else "Pause"
+                            Text("$text Video")
+                        }
+
+                        Text(
+                            "${time}s",
+                            modifier = Modifier.align(Alignment.CenterVertically).padding(horizontal = 30.dp)
+                                .padding(top = 2.dp)
+                        )
                     }
                 }
             }
