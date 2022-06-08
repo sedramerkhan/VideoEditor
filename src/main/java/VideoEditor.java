@@ -204,7 +204,7 @@ public class VideoEditor {
 
             }
             else if (position>end){
-                move(matList,start,end+1,position);
+                move(matList,start,end+1,position+end-start+1);
                 System.out.println("Frames Are Moved Successfully");
 
             }else
