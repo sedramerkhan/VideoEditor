@@ -1,12 +1,9 @@
 
 import org.opencv.core.*;
-import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -16,15 +13,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.opencv.imgproc.Imgproc.putText;
-
 
 public class VideoEditor {
 
     VideoCapture vCapture;
 
     VideoWriter videoWriter;
-    ExecutorService e = Executors.newFixedThreadPool(5);
 
     public VideoEditor() {
         this.vCapture = new VideoCapture();
@@ -44,13 +38,13 @@ public class VideoEditor {
                 vCapture.retrieve(list.get(list.size() - 1));
             }
             System.out.println("Getting Frames is Done Successfully");
-            System.out.println("We Have "+list.size()+" Frames With Size "+list.get(0).size());
+            System.out.println("We Have " + list.size() + " Frames With Size " + list.get(0).size());
             vCapture.release();
             return list;
         }
     }
 
-    public void write(List<Mat> matList,String videoPath, int fps) {
+    public void write(List<Mat> matList, String videoPath, int fps) {
 
         videoWriter = new VideoWriter(videoPath, VideoWriter.fourcc('X', '2', '6', '4'),
                 fps, new Size(matList.get(0).width(), matList.get(0).height()), true);
@@ -86,6 +80,13 @@ public class VideoEditor {
         w.dispose();
         return Converter.toMat(image);
     }
+
+    public void addTextWaterMark(List<Mat> matList, String text, float alpha) {
+        ExecutorService e = Executors.newFixedThreadPool(5);
+        for (int i = 0; i < matList.size(); i++) {
+            int finalI = i;
+            e.execute(() -> {
+                Mat source = matList.get(finalI);
     public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
         for (int i = 0  ;i < matList.size();i++) {
                 Mat source= matList.get(i);
@@ -112,29 +113,28 @@ public class VideoEditor {
 
     }
 
-    public void addVideoWaterMark(List<Mat> matList, String path,double alpha) {
+    public void addVideoWaterMark(List<Mat> matList, String path, double alpha) {
         List<Mat> waterMark = this.getFrames(path);
-        if(waterMark != null) {
-            for (int i = 0; i <matList.size(); i++) {
+        if (waterMark != null) {
+            for (int i = 0; i < matList.size(); i++) {
                 Mat source = matList.get(i).clone();
-                Mat waterMarkImage = this.resize(source.size(), waterMark.get(i%waterMark.size()));
+                Mat waterMarkImage = this.resize(source.size(), waterMark.get(i % waterMark.size()));
                 Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
-                Core.addWeighted(source.submat(ROI), alpha, waterMarkImage, 1-alpha, 1, source.submat(ROI));
-                matList.set(i,source);
+                Core.addWeighted(source.submat(ROI), alpha, waterMarkImage, 1 - alpha, 1, source.submat(ROI));
+                matList.set(i, source);
             }
             System.out.println("Video Water Mark is Added Successfully");
-        }
-        else
+        } else
             System.out.println("Something Went Wrong");
     }
 
     public void addSticker(List<Mat> matList, Mat emoji) {
-        emoji = this.resize(new Size(50,50), emoji);
-        for (int i =0; i< matList.size();i++) {
-            Mat source= matList.get(i).clone();
-            Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, emoji.cols(), emoji.rows());
+        emoji = this.resize(new Size(50, 50), emoji);
+        for (int i = 0; i < matList.size(); i++) {
+            Mat source = matList.get(i).clone();
+            Rect ROI = new Rect(matList.get(0).rows() / 3, matList.get(0).cols() / 3, emoji.cols(), emoji.rows());
             Core.addWeighted(source.submat(ROI), 0, emoji, 1, 1, source.submat(ROI));
-            matList.set(i,source);
+            matList.set(i, source);
 
         }
         System.out.println("Image Water Mark is Added Successfully");
@@ -143,36 +143,35 @@ public class VideoEditor {
 
     public void merge2Videos(List<Mat> matList, String path) {
         List<Mat> matList2 = this.getFrames(path);
-        if(matList2 != null) {
+        if (matList2 != null) {
             if (matList.get(0).size() != matList2.get(0).size()) {
                 matList2.replaceAll(it -> resize(matList.get(0).size(), it));
             }
             matList.addAll(matList2);
             System.out.println("Video is Added Successfully");
-        }
-        else
+        } else
             System.out.println("Something Went Wrong");
     }
 
     public void moveVideoFrames(List<Mat> matList, int start, int end, int position) {
         if (start < matList.size() && end < matList.size() && position <= matList.size()) {
-            if(position<start) {
-                move(matList,position,start,end+1);
+            if (position < start) {
+                move(matList, position, start, end + 1);
                 System.out.println("Frames Are Moved Successfully");
 
-            }
-            else if (position>end){
-                move(matList,start,end+1,position+end-start+1);
+            } else if (position > end) {
+                move(matList, start, end + 1, position + end - start + 1);
                 System.out.println("Frames Are Moved Successfully");
 
-            }else
+            } else
                 System.out.println("Something Went Wrong");
         } else
             System.out.println("Something Went Wrong");
     }
 
-    private void move(List<Mat> matList,int index1,int index2,int index3){
-        ArrayList<Mat> temp = new ArrayList(matList);;
+    private void move(List<Mat> matList, int index1, int index2, int index3) {
+        ArrayList<Mat> temp = new ArrayList(matList);
+        ;
         List<Mat> temp1 = temp.subList(0, index1);
         List<Mat> temp2 = temp.subList(index1, index2);
         List<Mat> temp3 = temp.subList(index2, index3);

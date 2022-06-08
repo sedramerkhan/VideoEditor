@@ -49,7 +49,7 @@ fun AddWaterMark(
         }
         WaterMarkState.Text -> {
             Row(modifier = modifier) {
-                CustomTextField(text, "Enter WaterMark", Modifier.width(200.dp)) { text = it }
+                CustomTextField(text, "WaterMark", Modifier.width(150.dp)) { text = it }
                 var alpha by remember { mutableStateOf("") }
                 CustomTextField(alpha, "Alpha", modifier = Modifier.width(80.dp)) {
                     alpha = it

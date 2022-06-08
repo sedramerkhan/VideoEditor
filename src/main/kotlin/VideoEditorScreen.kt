@@ -16,38 +16,30 @@ import javax.swing.filechooser.FileNameExtensionFilter
 @Composable
 fun VideoEditorScreen() {
 
-    var path by remember { mutableStateOf("src/main/resources/test1.mp4") }
     val editor by remember { mutableStateOf(VideoEditor()) }
     val matList = remember { mutableStateListOf<Mat>() }
-    var state by remember { mutableStateOf(VideoState.Nothing) }
+    var state by remember { mutableStateOf(VideoState.VideoPlaying) }
     val matListPreviews = remember { mutableStateListOf<Mat>() }
     val fps = remember { mutableStateOf(3) }
     var videoPath by remember { mutableStateOf("C:\\") }
     var audioPath by remember { mutableStateOf("") }
     val videoName = "\\withoutSound1.mp4"
-    //Todo: delete this
-    LaunchedEffect(Unit)
-    {
-        matList.addAll(editor.getFrames(path))
-        matListPreviews.clone(matList)
-
-//        player.openVideo(path)
-//        do {
-//            val mat: Mat? = player.getFrame()
-//            mat?.let {
-//                matList.add(it)
-//            }
-//        } while (mat != null)
-    }
 
     if (matList.isEmpty()) {
-        EnterVideo(
-            path = path,
-            onPathChanged = { path = it }
-        ) {
-            if (path.isNotEmpty()) {
-                matList.addAll(editor.getFrames(path))
-                matListPreviews.clone(matList)
+        var text by remember { mutableStateOf("Get Video") }
+        Box(Modifier.fillMaxSize()) {
+            Button(modifier = Modifier.width(500.dp).align(Alignment.Center), onClick = {
+                val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
+                if (result.isNotEmpty()) {
+                    result[0]?.let {
+                        text = "Loading"
+                        matList.addAll(editor.getFrames(it.path))
+                        matListPreviews.clone(matList)
+                    }
+                }
+            })
+            {
+                Text(text)
             }
         }
     } else {
@@ -56,13 +48,16 @@ fun VideoEditorScreen() {
         val textFieldModifier = Modifier.width(80.dp)
 
         var i by remember { mutableStateOf(0) }
+        var time by remember { mutableStateOf(0) }
 
         LaunchedEffect(state) {
             i = 0
-            while (state == VideoState.Nothing) {
+            while (state == VideoState.VideoPlaying) {
                 if (i < matList.size - 1) i++
                 else i = 0
-                delay((1000 / (fps.value * 10)).toLong())
+                val fpsValue = fps.value * 10
+                delay((1000 / fpsValue).toLong())
+                time = i / fpsValue
             }
         }
         Row(
@@ -90,7 +85,7 @@ fun VideoEditorScreen() {
                             matListPreviews.clone(matList)
                             editor.addTextWaterMark(matList, path, alpha.toFloat())
                         },
-                        onFinish = { state = VideoState.Nothing }
+                        onFinish = { state = VideoState.VideoPlaying }
                     )
                 }
 
@@ -98,10 +93,10 @@ fun VideoEditorScreen() {
                 { Text(text = "Add Sticker") }
                 if (state == VideoState.StickerAdding) {
 
-                    DisplayStickers(modifier = modifier.width(280.dp)){
+                    DisplayStickers(modifier = modifier.width(280.dp)) {
                         matListPreviews.clone(matList)
-                        editor.addSticker(matList,it)
-                        state = VideoState.Nothing
+                        editor.addSticker(matList, it)
+                        state = VideoState.VideoPlaying
                     }
                 }
 
@@ -113,7 +108,7 @@ fun VideoEditorScreen() {
                     result.forEach {
                         it?.let { editor.merge2Videos(matList, it.path) }
                     }
-                    state = VideoState.Nothing
+                    state = VideoState.VideoPlaying
                 }
 
                 Button(onClick = { state = VideoState.VideoFromImages }, modifier = buttonModifier)
@@ -131,7 +126,7 @@ fun VideoEditorScreen() {
                         matList.clear()
                         matList.addAll(list.map { image -> editor.resize(Size(350.0, 350.0), image) })
                     }
-                    state = VideoState.Nothing
+                    state = VideoState.VideoPlaying
                 }
 
                 Button(onClick = { state = VideoState.VideoResizing }, modifier = buttonModifier)
@@ -146,7 +141,7 @@ fun VideoEditorScreen() {
                             println("resize video from ${matList[0].size()} to $size")
                             matList.clear()
                             matList.addAll(list)
-                            state = VideoState.Nothing
+                            state = VideoState.VideoPlaying
                         }
                     )
                 }
@@ -160,7 +155,7 @@ fun VideoEditorScreen() {
                     ) { start, end, position ->
                         matListPreviews.clone(matList)
                         editor.moveVideoFrames(matList, start, end, position)
-                        state = VideoState.Nothing
+                        state = VideoState.VideoPlaying
                     }
                 }
 
@@ -173,7 +168,7 @@ fun VideoEditorScreen() {
                     ) { start, end ->
                         matListPreviews.clone(matList)
                         editor.deleteVideoFrames(matList, start, end)
-                        state = VideoState.Nothing
+                        state = VideoState.VideoPlaying
                     }
                 }
 
@@ -187,7 +182,7 @@ fun VideoEditorScreen() {
                             state = VideoState.VideoSavingWithAudio
                         }
                     } else
-                        state = VideoState.Nothing
+                        state = VideoState.VideoPlaying
                 }
                 if (state == VideoState.VideoSavingWithAudio) {
                     ChooseFPS(
@@ -202,7 +197,7 @@ fun VideoEditorScreen() {
                                 editor.write(matList, videoPath + videoName, fps.value * 10)
                                 Audio(audioPath, videoPath, videoName).createVideoWithAudioAndPhoto()
                             }
-                            state = VideoState.Nothing
+                            state = VideoState.VideoPlaying
                         }
                     )
                 }
@@ -221,33 +216,68 @@ fun VideoEditorScreen() {
                                 videoPath = it.path
                                 editor.write(matList, videoPath + videoName, fps.value * 10)
                             }
-                            state = VideoState.Nothing
+                            state = VideoState.VideoPlaying
                         }
                     )
                 }
 
                 Button(onClick = {
                     println(matListPreviews.size)
-                    state = VideoState.Nothing
+                    state = VideoState.VideoPlaying
                     matList.clear()
                     matList.addAll(matListPreviews)
                 }, modifier = buttonModifier)
                 { Text(text = "Undo ") }
 
+
+                Button(modifier = buttonModifier, onClick = {
+                    val result = openLogFile(FileNameExtensionFilter("Videos", "avi", "mp4"))
+                    if (result.isNotEmpty()) {
+                        result[0]?.let {
+                            matListPreviews.clone(matList)
+                            matList.clear()
+                            matList.addAll(editor.getFrames(it.path))
+                        }
+                    }
+                })
+                {
+                    Text("Get New Video")
+                }
+
             }
 
             Spacer(Modifier.width(30.dp))
             Column {
-//                println(matList.size)
-                ImageLazyRow(matList, Modifier)
 
-                Box(modifier.fillMaxSize()) {
+                ImageLazyRow(matList, Modifier)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Image(
                         bitmap = matList[i % matList.size].asImageAsset(),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.height(400.dp).width(600.dp).align(Alignment.Center)
+                        modifier = Modifier.height(400.dp).width(600.dp)
                     )
+                    Row()
+                    {
+                        Button(modifier = buttonModifier, onClick = {
+                            state =
+                                if (state != VideoState.VideoPlaying) VideoState.VideoPlaying else VideoState.VideoPausing
+                        })
+                        {
+                            val text = if (state != VideoState.VideoPlaying) "Play" else "Pause"
+                            Text("$text Video")
+                        }
+
+                        Text(
+                            "${time}s",
+                            modifier = Modifier.align(Alignment.CenterVertically).padding(horizontal = 30.dp)
+                                .padding(top = 2.dp)
+                        )
+                    }
                 }
             }
         }
