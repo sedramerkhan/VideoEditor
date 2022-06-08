@@ -170,14 +170,12 @@ public class VideoEditor {
             System.out.println("Something Went Wrong");
     }
 
-    public void addSticker(List<Mat> matList, String path) {
-        Mat waterMark = Imgcodecs.imread(path);
-
-        waterMark = this.resize(new Size(50,50), waterMark);
+    public void addSticker(List<Mat> matList, Mat emoji) {
+        emoji = this.resize(new Size(50,50), emoji);
         for (int i =0; i< matList.size();i++) {
             Mat source= matList.get(i).clone();
-            Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, waterMark.cols(), waterMark.rows());
-            Core.addWeighted(source.submat(ROI), 0, waterMark, 1, 1, source.submat(ROI));
+            Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, emoji.cols(), emoji.rows());
+            Core.addWeighted(source.submat(ROI), 0, emoji, 1, 1, source.submat(ROI));
             matList.set(i,source);
 
         }
