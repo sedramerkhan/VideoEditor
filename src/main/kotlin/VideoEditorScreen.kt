@@ -203,7 +203,7 @@ fun VideoEditorScreen() {
                                 matListPreviews.clone(matList)
                                 videoPath = it.path
                                 editor.write(matList, videoPath + videoName, fps.value * 10)
-                                Audio().createVideoWithAudioAndPhoto(audioPath, videoPath, videoName, fps.value)
+                                Audio(audioPath, videoPath, videoName).createVideoWithAudioAndPhoto()
                             }
                             state = VideoState.Nothing
                         }
