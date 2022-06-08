@@ -24,6 +24,7 @@ public class VideoEditor {
     VideoCapture vCapture;
 
     VideoWriter videoWriter;
+    ExecutorService e = Executors.newFixedThreadPool(5);
 
     public VideoEditor() {
         this.vCapture = new VideoCapture();
@@ -86,18 +87,15 @@ public class VideoEditor {
         return Converter.toMat(image);
     }
     public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
-        ExecutorService e = Executors.newFixedThreadPool(5);
         for (int i = 0  ;i < matList.size();i++) {
-            int finalI = i;
-            e.execute(()->{
-                Mat source= matList.get(finalI);
+                Mat source= matList.get(i);
                 try {
-                    matList.set(finalI,addTextWatermark(text,source,alpha));
+                    matList.set(i,addTextWatermark(text,source,alpha));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-            });
-        }
+            }
+
         System.out.println("Text Water Mark is Added Successfully");
     }
     public void addImageWaterMark(List<Mat> matList, String path,double alpha) {

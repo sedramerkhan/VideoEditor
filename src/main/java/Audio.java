@@ -90,8 +90,6 @@ public class Audio {
         }
     }
     private static int getEndFrameNumber(long videoDuration, long audioDuration, int totalFrame) {
-//        if (videoDuration >= audioDuration)
-//            return (int) videoDuration;
         double percent = videoDuration / (double) audioDuration;
         return (int) Math.ceil(totalFrame * percent);
     }
