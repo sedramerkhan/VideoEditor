@@ -91,19 +91,20 @@ public class Audio {
                 counter++;
                 recorder.record(frame);
             }
-            System.out.println("\ncounter in video " + counter);
+//            System.out.println("\ncounter in video " + counter);
             counter *= 2;
             //record audio frame
             while (counter >= 0 && (frame = audioGrabber.grabFrame()) != null) {
                 counter--;
                 recorder.record(frame);
             }
-            System.out.println("counter in audio " + counter);
+//            System.out.println("counter in audio " + counter);
             //complete
             recorder.stop();
             //output path
             System.out.println("The Audio is Saved in ");
-            System.out.println(new File(videoGenPath));
+            String path = new File(videoGenPath).getAbsolutePath();
+            System.out.print(path);
         } catch (Exception e) {
 //           System.out.println(e);
         } finally {

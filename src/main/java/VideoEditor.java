@@ -76,7 +76,8 @@ public class VideoEditor {
                 list.add(new Mat());
                 vCapture.retrieve(list.get(list.size() - 1));
             }
-            System.out.println("Getting Frames is Done Successfuly");
+            System.out.println("Getting Frames is Done Successfully");
+            System.out.println("We Have "+list.size()+" Frames With Size "+list.get(0).size());
             vCapture.release();
             return list;
         }
@@ -199,12 +200,32 @@ public class VideoEditor {
 
     public void moveVideoFrames(List<Mat> matList, int start, int end, int position) {
         if (start < matList.size() && end < matList.size() && position <= matList.size()) {
-            List<Mat> temp = matList.subList(start, end + 1);
-            matList.addAll(position, temp);
-            matList.subList(start, end + 1).clear();
-            System.out.println("Frames Are Moved Successfully");
+            if(position<start) {
+                move(matList,position,start,end+1);
+                System.out.println("Frames Are Moved Successfully");
+
+            }
+            else if (position>end){
+                move(matList,start,end+1,position);
+                System.out.println("Frames Are Moved Successfully");
+
+            }else
+                System.out.println("Something Went Wrong");
         } else
             System.out.println("Something Went Wrong");
+    }
+
+    private void move(List<Mat> matList,int index1,int index2,int index3){
+        ArrayList<Mat> temp = new ArrayList(matList);;
+        List<Mat> temp1 = temp.subList(0, index1);
+        List<Mat> temp2 = temp.subList(index1, index2);
+        List<Mat> temp3 = temp.subList(index2, index3);
+        List<Mat> temp4 = temp.subList(index3, matList.size());
+        matList.clear();
+        matList.addAll(temp1);
+        matList.addAll(temp3);
+        matList.addAll(temp2);
+        matList.addAll(temp4);
     }
 
     public void deleteVideoFrames(List<Mat> matList, int start, int end) {
