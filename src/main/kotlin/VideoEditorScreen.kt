@@ -2,7 +2,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -11,7 +10,6 @@ import kotlinx.coroutines.delay
 import org.opencv.core.Mat
 import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs.imread
-import org.opencv.imgcodecs.Imgcodecs.imwrite
 import javax.swing.filechooser.FileNameExtensionFilter
 
 
@@ -32,6 +30,7 @@ fun VideoEditorScreen() {
     {
         matList.addAll(editor.getFrames(path))
         matListPreviews.clone(matList)
+
 //        player.openVideo(path)
 //        do {
 //            val mat: Mat? = player.getFrame()
@@ -89,7 +88,7 @@ fun VideoEditorScreen() {
                         },
                         onTextSelected = { path, alpha ->
                             matListPreviews.clone(matList)
-                            editor.addTextWaterMark(matList, path, alpha)
+                            editor.addTextWaterMark(matList, path, alpha.toFloat())
                         },
                         onFinish = { state = VideoState.Nothing }
                     )
@@ -99,13 +98,11 @@ fun VideoEditorScreen() {
                 { Text(text = "Add Sticker") }
                 if (state == VideoState.StickerAdding) {
 
-                    val result = openLogFile(FileNameExtensionFilter("Images", "jpg", "png", "gif", "bmp"))
-                    if (result.isNotEmpty()) {
-                        result[0]?.let {
-                            editor.addSticker(matList, it.path)
-                        }
+                    DisplayStickers(modifier = modifier.width(280.dp)){
+                        matListPreviews.clone(matList)
+                        editor.addSticker(matList,it)
+                        state = VideoState.Nothing
                     }
-                    state = VideoState.Nothing
                 }
 
                 Button(onClick = { state = VideoState.VideosMerging }, modifier = buttonModifier)

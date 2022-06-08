@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 public class Converter {
 
-    Mat toMat(BufferedImage input) {
+    public static Mat toMat(BufferedImage input) {
         if (input == null)
             System.out.println("nnn");
         Mat mat = new Mat(input.getHeight(), input.getWidth(), CvType.CV_8UC3);
@@ -21,7 +21,7 @@ public class Converter {
         return mat;
     }
 
-    BufferedImage toBufferedImage(Mat input) throws IOException {
+    public static BufferedImage toBufferedImage(Mat input) throws IOException {
         MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpg", input, matOfByte);
         //Storing the encoded Mat in a byte array

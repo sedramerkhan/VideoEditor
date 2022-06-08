@@ -7,6 +7,10 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +76,8 @@ public class VideoEditor {
                 list.add(new Mat());
                 vCapture.retrieve(list.get(list.size() - 1));
             }
-            System.out.println("Getting Frames is Done Successfuly");
+            System.out.println("Getting Frames is Done Successfully");
+            System.out.println("We Have "+list.size()+" Frames With Size "+list.get(0).size());
             vCapture.release();
             return list;
         }
@@ -89,23 +94,61 @@ public class VideoEditor {
         System.out.println("Saved To Disk Successfully");
     }
 
-    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
-        for (Mat source : matList) {
+//    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
+//        for (Mat source : matList) {
+//            putText(source, text,
+//                    new Point(source.rows() / 2, source.cols() / 5),
+//                    Imgproc.FONT_HERSHEY_PLAIN, 1.0,
+//                    new Scalar(255, 150, 200, 30), 1);
+//        }
+//        System.out.println("Text Water Mark is Added Successfully");
+//    }
+    private static Mat addTextWatermark(String text, Mat source, float alpha) throws IOException, IOException {
+        BufferedImage image = Converter.toBufferedImage(source);
+
+        // determine image type and handle correct transparency
+        // initializes necessary graphic properties
+        Graphics2D w = (Graphics2D) image.getGraphics();
+        //       w.drawImage(image, 0, 0, null);
+        AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        w.setComposite(alphaChannel);
+        w.setColor(Color.GRAY);
+        w.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 26));
+        FontMetrics fontMetrics = w.getFontMetrics();
+        Rectangle2D rect = fontMetrics.getStringBounds(text, w);
+
+        // calculate center of the image
+        int centerX = (image.getWidth() - (int) rect.getWidth()) / 2;
+        int centerY = image.getHeight() / 2;
+
+        // add text overlay to the image
+        w.drawString(text, centerX, centerY);
+        //  Imgcodecs.imwrite("D:\\test.jpg",Converter.toMat(image));
+
+        w.dispose();
+        return Converter.toMat(image);
+    }
+    public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
+        for (int i = 0  ;i < matList.size();i++) {
+            Mat source= matList.get(i);
+            matList.set(i,addTextWatermark(text,source,alpha));
+            /*
             putText(source, text,
                     new Point(source.rows() / 2, source.cols() / 5),
                     Imgproc.FONT_HERSHEY_PLAIN, 1.0,
                     new Scalar(255, 150, 200, 30), 1);
-        }
+*/        }
         System.out.println("Text Water Mark is Added Successfully");
     }
-
     public void addImageWaterMark(List<Mat> matList, String path,double alpha) {
         Mat waterMark = Imgcodecs.imread(path);
         waterMark = this.resize(matList.get(0).size(), waterMark);
         System.out.println("water mark image: " + waterMark.size());
-        for (Mat source : matList) {
+        for (int i =0; i< matList.size();i++) {
+            Mat source= matList.get(i).clone();
             Rect ROI = new Rect(0, 0, waterMark.cols(), waterMark.rows());
             Core.addWeighted(source.submat(ROI), alpha, waterMark, 1-alpha, 1, source.submat(ROI));
+            matList.set(i,source);
         }
         System.out.println("Image Water Mark is Added Successfully");
 
@@ -115,11 +158,11 @@ public class VideoEditor {
         List<Mat> waterMark = this.getFrames(path);
         if(waterMark != null) {
             for (int i = 0; i <matList.size(); i++) {
-                Mat source = matList.get(i);
+                Mat source = matList.get(i).clone();
                 Mat waterMarkImage = this.resize(source.size(), waterMark.get(i%waterMark.size()));
                 Rect ROI = new Rect(0, 0, waterMarkImage.cols(), waterMarkImage.rows());
                 Core.addWeighted(source.submat(ROI), alpha, waterMarkImage, 1-alpha, 1, source.submat(ROI));
-
+                matList.set(i,source);
             }
             System.out.println("Video Water Mark is Added Successfully");
         }
@@ -127,13 +170,14 @@ public class VideoEditor {
             System.out.println("Something Went Wrong");
     }
 
-    public void addSticker(List<Mat> matList, String path) {
-        Mat waterMark = Imgcodecs.imread(path);
+    public void addSticker(List<Mat> matList, Mat emoji) {
+        emoji = this.resize(new Size(50,50), emoji);
+        for (int i =0; i< matList.size();i++) {
+            Mat source= matList.get(i).clone();
+            Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, emoji.cols(), emoji.rows());
+            Core.addWeighted(source.submat(ROI), 0, emoji, 1, 1, source.submat(ROI));
+            matList.set(i,source);
 
-        waterMark = this.resize(new Size(50,50), waterMark);
-        for (Mat source : matList) {
-            Rect ROI = new Rect(matList.get(0).rows()/3, matList.get(0).cols()/3, waterMark.cols(), waterMark.rows());
-            Core.addWeighted(source.submat(ROI), 0, waterMark, 1, 1, source.submat(ROI));
         }
         System.out.println("Image Water Mark is Added Successfully");
 
@@ -154,12 +198,32 @@ public class VideoEditor {
 
     public void moveVideoFrames(List<Mat> matList, int start, int end, int position) {
         if (start < matList.size() && end < matList.size() && position <= matList.size()) {
-            List<Mat> temp = matList.subList(start, end + 1);
-            matList.addAll(position, temp);
-            matList.subList(start, end + 1).clear();
-            System.out.println("Frames Are Moved Successfully");
+            if(position<start) {
+                move(matList,position,start,end+1);
+                System.out.println("Frames Are Moved Successfully");
+
+            }
+            else if (position>end){
+                move(matList,start,end+1,position);
+                System.out.println("Frames Are Moved Successfully");
+
+            }else
+                System.out.println("Something Went Wrong");
         } else
             System.out.println("Something Went Wrong");
+    }
+
+    private void move(List<Mat> matList,int index1,int index2,int index3){
+        ArrayList<Mat> temp = new ArrayList(matList);;
+        List<Mat> temp1 = temp.subList(0, index1);
+        List<Mat> temp2 = temp.subList(index1, index2);
+        List<Mat> temp3 = temp.subList(index2, index3);
+        List<Mat> temp4 = temp.subList(index3, matList.size());
+        matList.clear();
+        matList.addAll(temp1);
+        matList.addAll(temp3);
+        matList.addAll(temp2);
+        matList.addAll(temp4);
     }
 
     public void deleteVideoFrames(List<Mat> matList, int start, int end) {
