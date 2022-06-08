@@ -16,7 +16,7 @@ import utils.CustomLazyRow
 @Composable
 fun DisplayStickers(modifier: Modifier, onSelectedEmoji: (Mat)-> Unit){
     val emojis = mutableStateListOf<Mat>()
-    for(i in 0..16){
+    for(i in 0..18){
         emojis.add(imread("src/main/resources/emojis/img_$i.png"))
     }
     CustomLazyRow(emojis,modifier){ mat,_ ->
