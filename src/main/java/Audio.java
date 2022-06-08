@@ -44,8 +44,8 @@ public class Audio {
             initRecorder();
             Frame frame;
             int counter = 0;
-            long videoDuration = videoGrabber.getFormatContext().duration() / 1000000;
-            long audioDuration = audioGrabber.getFormatContext().duration() / 1000000;
+            long videoDuration = videoGrabber.getFormatContext().duration() / 1000_000;
+            long audioDuration = audioGrabber.getFormatContext().duration() / 1000_000;
             //record video frame
             while ((frame = videoGrabber.grabFrame()) != null) {
                 recorder.record(frame);
@@ -89,10 +89,10 @@ public class Audio {
             }
         }
     }
-    private static int getEndFrameNumber(long videoDuration, long durationInSecond, int totalFrame) {
-        if (videoDuration >= durationInSecond)
-            return (int) videoDuration;
-        double percent = videoDuration / (double) durationInSecond;
+    private static int getEndFrameNumber(long videoDuration, long audioDuration, int totalFrame) {
+//        if (videoDuration >= audioDuration)
+//            return (int) videoDuration;
+        double percent = videoDuration / (double) audioDuration;
         return (int) Math.ceil(totalFrame * percent);
     }
 }
