@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.opencv.imgproc.Imgproc.putText;
 
@@ -27,42 +29,6 @@ public class VideoEditor {
         this.vCapture = new VideoCapture();
     }
 
-    public VideoEditor(String path) {
-        this.vCapture = new VideoCapture();
-        vCapture.open(path);
-    }
-
-    public VideoEditor(VideoCapture vCapture) {
-        this.vCapture = vCapture;
-    }
-
-    public boolean openVideo(String path) {
-        try {
-            vCapture.open(path);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Mat getFrame() {
-        Mat mat = new Mat();
-        if (!vCapture.isOpened()) {
-            System.out.println("media failed to open");
-            return null;
-        } else {
-            if (vCapture.grab()) {
-                vCapture.retrieve(mat);
-//                System.out.println(matList.size());
-//                showInFrame(mat);
-                return mat;
-            } else {
-                System.out.println("Video Frames are Captured");
-                vCapture.release();
-                return null;
-            }
-        }
-    }
 
     public List<Mat> getFrames(String path) {
         vCapture.open(path);
@@ -94,16 +60,7 @@ public class VideoEditor {
         System.out.println("Saved To Disk Successfully");
     }
 
-//    public void addTextWaterMark(List<Mat> matList, String text,double alpha) {
-//        for (Mat source : matList) {
-//            putText(source, text,
-//                    new Point(source.rows() / 2, source.cols() / 5),
-//                    Imgproc.FONT_HERSHEY_PLAIN, 1.0,
-//                    new Scalar(255, 150, 200, 30), 1);
-//        }
-//        System.out.println("Text Water Mark is Added Successfully");
-//    }
-    private static Mat addTextWatermark(String text, Mat source, float alpha) throws IOException, IOException {
+    private static Mat addTextWatermark(String text, Mat source, float alpha) throws IOException {
         BufferedImage image = Converter.toBufferedImage(source);
 
         // determine image type and handle correct transparency
@@ -129,15 +86,18 @@ public class VideoEditor {
         return Converter.toMat(image);
     }
     public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
+        ExecutorService e = Executors.newFixedThreadPool(5);
         for (int i = 0  ;i < matList.size();i++) {
-            Mat source= matList.get(i);
-            matList.set(i,addTextWatermark(text,source,alpha));
-            /*
-            putText(source, text,
-                    new Point(source.rows() / 2, source.cols() / 5),
-                    Imgproc.FONT_HERSHEY_PLAIN, 1.0,
-                    new Scalar(255, 150, 200, 30), 1);
-*/        }
+            int finalI = i;
+            e.execute(()->{
+                Mat source= matList.get(finalI);
+                try {
+                    matList.set(finalI,addTextWatermark(text,source,alpha));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        }
         System.out.println("Text Water Mark is Added Successfully");
     }
     public void addImageWaterMark(List<Mat> matList, String path,double alpha) {
