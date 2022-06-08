@@ -81,12 +81,6 @@ public class VideoEditor {
         return Converter.toMat(image);
     }
 
-    public void addTextWaterMark(List<Mat> matList, String text, float alpha) {
-        ExecutorService e = Executors.newFixedThreadPool(5);
-        for (int i = 0; i < matList.size(); i++) {
-            int finalI = i;
-            e.execute(() -> {
-                Mat source = matList.get(finalI);
     public void addTextWaterMark(List<Mat> matList, String text, float alpha) throws IOException {
         for (int i = 0  ;i < matList.size();i++) {
                 Mat source= matList.get(i);
@@ -99,6 +93,7 @@ public class VideoEditor {
 
         System.out.println("Text Water Mark is Added Successfully");
     }
+
     public void addImageWaterMark(List<Mat> matList, String path,double alpha) {
         Mat waterMark = Imgcodecs.imread(path);
         waterMark = this.resize(matList.get(0).size(), waterMark);
